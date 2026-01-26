@@ -2,107 +2,94 @@ import { AbsoluteFill, useCurrentFrame, interpolate, Easing, spring, useVideoCon
 import { COLORS } from "./Background";
 
 // ============================================
-// LaborRx Logo Icon Component
+// LaborRx Logo Icon Component (matches screenshot exactly)
 // ============================================
 const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
   <div style={{ width: size, height: size, position: "relative" }}>
+    {/* Horizontal ellipse */}
     <div
       style={{
         position: "absolute",
-        width: size * 0.875,
-        height: size * 0.5,
-        left: size * 0.0625,
-        top: size * 0.25,
+        width: size * 0.95,
+        height: size * 0.55,
+        left: size * 0.025,
+        top: size * 0.225,
         borderRadius: "50%",
-        background: COLORS.primary,
-        opacity: 0.95,
+        background: "#E8705A",
       }}
     />
+    {/* Vertical ellipse */}
     <div
       style={{
         position: "absolute",
-        width: size * 0.5,
-        height: size * 0.875,
-        left: size * 0.25,
-        top: size * 0.0625,
+        width: size * 0.55,
+        height: size * 0.95,
+        left: size * 0.225,
+        top: size * 0.025,
         borderRadius: "50%",
-        background: COLORS.primary,
-        opacity: 0.9,
+        background: "#E8705A",
+        opacity: 0.85,
       }}
     />
+    {/* Center overlap (darker) */}
     <div
       style={{
         position: "absolute",
-        width: size * 0.375,
-        height: size * 0.375,
-        left: size * 0.3125,
-        top: size * 0.3125,
+        width: size * 0.42,
+        height: size * 0.42,
+        left: size * 0.29,
+        top: size * 0.29,
         borderRadius: "50%",
-        background: COLORS.accent,
-        opacity: 0.75,
+        background: "#D85A45",
+        opacity: 0.7,
       }}
     />
   </div>
 );
 
 // ============================================
-// Scene 1: Trendy Logo Reveal
+// Scene 1: Logo Reveal (matches screenshot exactly)
 // ============================================
 export const LogoRevealScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Smooth material reveal with trendy timing
+  // Smooth fade in
   const progress = spring({
     frame,
     fps,
-    config: { damping: 25, stiffness: 60, mass: 1.2 },
+    config: { damping: 20, stiffness: 80, mass: 0.8 },
   });
 
   const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const scale = interpolate(progress, [0, 1], [0.92, 1]);
-  const blur = interpolate(progress, [0, 0.6], [8, 0], { extrapolateRight: "clamp" });
-  const translateY = interpolate(progress, [0, 1], [25, 0]);
-
-  // Subtle glow effect
-  const glowOpacity = interpolate(frame, [20, 40], [0, 0.4], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const scale = interpolate(progress, [0, 1], [0.96, 1]);
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-      {/* Glow behind logo */}
-      <div
-        style={{
-          position: "absolute",
-          width: 400,
-          height: 200,
-          background: `radial-gradient(ellipse, ${COLORS.primary}30 0%, transparent 70%)`,
-          filter: "blur(40px)",
-          opacity: glowOpacity,
-        }}
-      />
-
+    <AbsoluteFill
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F5F1EB",
+      }}
+    >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 28,
+          gap: 24,
           opacity,
-          transform: `scale(${scale}) translateY(${translateY}px)`,
-          filter: `blur(${blur}px)`,
+          transform: `scale(${scale})`,
         }}
       >
-        <LaborRxIcon size={100} />
+        <LaborRxIcon size={110} />
         <h1
           style={{
-            fontSize: 76,
+            fontSize: 82,
             fontWeight: 700,
             fontFamily: "system-ui, -apple-system, sans-serif",
-            color: COLORS.secondary,
+            color: "#1a1a1a",
             margin: 0,
-            letterSpacing: "-3px",
+            letterSpacing: "-2px",
           }}
         >
           LaborRx
