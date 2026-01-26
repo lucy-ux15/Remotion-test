@@ -1,3 +1,4 @@
+import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
 import type { Feature } from "../compositions/ProductDemo";
 
@@ -7,6 +8,34 @@ interface FeatureHighlightProps {
 }
 
 const icons = {
+  calendar: (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <path d="M8 14h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 18h.01" />
+      <path d="M12 18h.01" />
+    </svg>
+  ),
+  chart: (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M18 20V10" />
+      <path d="M12 20V4" />
+      <path d="M6 20v-6" />
+      <path d="M3 20h18" />
+    </svg>
+  ),
+  budget: (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v12" />
+      <path d="M15 9.5c0-1.5-1.5-2.5-3-2.5s-3 1-3 2.5 1.5 2.5 3 2.5 3 1 3 2.5-1.5 2.5-3 2.5" />
+    </svg>
+  ),
   zap: (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -18,28 +47,18 @@ const icons = {
       <path d="M9 12l2 2 4-4" />
     </svg>
   ),
-  chart: (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M18 20V10" />
-      <path d="M12 20V4" />
-      <path d="M6 20v-6" />
-      <circle cx="18" cy="8" r="2" />
-      <circle cx="12" cy="2" r="2" />
-      <circle cx="6" cy="12" r="2" />
-    </svg>
-  ),
 };
 
 const gradients = [
-  "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-  "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)",
-  "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+  "linear-gradient(135deg, #E8705B 0%, #D69382 100%)",
+  "linear-gradient(135deg, #4A9B7F 0%, #6BB89D 100%)",
+  "linear-gradient(135deg, #E8705B 0%, #C45D4A 100%)",
 ];
 
 const glowColors = [
-  "rgba(99, 102, 241, 0.4)",
-  "rgba(16, 185, 129, 0.4)",
-  "rgba(245, 158, 11, 0.4)",
+  "rgba(232, 112, 91, 0.35)",
+  "rgba(74, 155, 127, 0.35)",
+  "rgba(232, 112, 91, 0.35)",
 ];
 
 export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, index }) => {
@@ -134,6 +153,8 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
     },
   });
 
+  const iconKey = feature.icon as keyof typeof icons;
+
   return (
     <AbsoluteFill
       style={{
@@ -156,7 +177,7 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
             fontSize: 24,
             fontWeight: 600,
             fontFamily: "system-ui, -apple-system, sans-serif",
-            color: "rgba(255, 255, 255, 0.3)",
+            color: "rgba(74, 74, 74, 0.4)",
             letterSpacing: "4px",
           }}
         >
@@ -187,11 +208,11 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
             justifyContent: "center",
             alignItems: "center",
             transform: `scale(${iconScale})`,
-            boxShadow: `0 20px 60px ${glowColors[index]}, 0 8px 20px rgba(0, 0, 0, 0.3)`,
+            boxShadow: `0 20px 60px ${glowColors[index]}, 0 8px 20px rgba(0, 0, 0, 0.1)`,
             color: "white",
           }}
         >
-          {icons[feature.icon]}
+          {icons[iconKey] || icons.zap}
         </div>
 
         {/* Title */}
@@ -206,7 +227,7 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
               fontSize: 64,
               fontWeight: 700,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "white",
+              color: "#1A1A1A",
               margin: 0,
               textAlign: "center",
               letterSpacing: "-1px",
@@ -228,7 +249,7 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
               fontSize: 28,
               fontWeight: 400,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "rgba(255, 255, 255, 0.7)",
+              color: "#4A4A4A",
               margin: 0,
               textAlign: "center",
               lineHeight: 1.5,
@@ -252,17 +273,17 @@ export const FeatureHighlight: React.FC<FeatureHighlightProps> = ({ feature, ind
         />
       </div>
 
-      {/* Decorative corner elements */}
+      {/* Decorative corner element */}
       <div
         style={{
           position: "absolute",
           bottom: 100,
           right: 100,
-          width: 200,
-          height: 200,
-          border: `2px solid ${glowColors[index].replace("0.4", "0.2")}`,
+          width: 150,
+          height: 150,
+          border: `2px solid ${glowColors[index].replace("0.35", "0.2")}`,
           borderRadius: 20,
-          transform: `scale(${decorScale}) rotate(${frame * 0.2}deg)`,
+          transform: `scale(${decorScale}) rotate(${frame * 0.1}deg)`,
         }}
       />
     </AbsoluteFill>

@@ -1,3 +1,4 @@
+import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
 
 interface CallToActionProps {
@@ -74,17 +75,17 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
     extrapolateRight: "clamp",
   });
 
-  // Particles animation
-  const particles = Array.from({ length: 8 }, (_, i) => {
-    const angle = (i / 8) * Math.PI * 2;
-    const radius = 280 + Math.sin(frame * 0.1 + i) * 20;
-    const x = Math.cos(angle + frame * 0.01) * radius;
-    const y = Math.sin(angle + frame * 0.01) * radius;
-    const particleOpacity = interpolate(frame, [20 + i * 5, 40 + i * 5], [0, 0.5], {
+  // Floating elements animation
+  const floatingElements = Array.from({ length: 6 }, (_, i) => {
+    const angle = (i / 6) * Math.PI * 2;
+    const radius = 300 + Math.sin(frame * 0.08 + i) * 30;
+    const x = Math.cos(angle + frame * 0.008) * radius;
+    const y = Math.sin(angle + frame * 0.008) * radius;
+    const elementOpacity = interpolate(frame, [20 + i * 5, 40 + i * 5], [0, 0.4], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
-    return { x, y, opacity: particleOpacity, size: 6 + (i % 3) * 2 };
+    return { x, y, opacity: elementOpacity, size: 10 + (i % 3) * 4 };
   });
 
   return (
@@ -95,31 +96,33 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         opacity: fadeIn,
       }}
     >
-      {/* Animated particles */}
-      {particles.map((particle, i) => (
+      {/* Animated floating elements */}
+      {floatingElements.map((element, i) => (
         <div
           key={i}
           style={{
             position: "absolute",
-            width: particle.size,
-            height: particle.size,
+            width: element.size,
+            height: element.size,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #6366f1, #a855f7)",
-            transform: `translate(${particle.x}px, ${particle.y}px)`,
-            opacity: particle.opacity,
-            boxShadow: "0 0 10px rgba(99, 102, 241, 0.5)",
+            background: i % 2 === 0
+              ? "linear-gradient(135deg, #E8705B, #D69382)"
+              : "linear-gradient(135deg, #4A9B7F, #6BB89D)",
+            transform: `translate(${element.x}px, ${element.y}px)`,
+            opacity: element.opacity,
+            boxShadow: "0 0 15px rgba(232, 112, 91, 0.3)",
           }}
         />
       ))}
 
-      {/* Glowing ring */}
+      {/* Soft glowing ring */}
       <div
         style={{
           position: "absolute",
           width: 500,
           height: 500,
           borderRadius: "50%",
-          border: "2px solid rgba(99, 102, 241, 0.2)",
+          border: "2px solid rgba(232, 112, 91, 0.15)",
           opacity: decorOpacity,
           transform: `scale(${0.8 + Math.sin(frame * 0.05) * 0.1})`,
         }}
@@ -130,7 +133,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
           width: 600,
           height: 600,
           borderRadius: "50%",
-          border: "1px solid rgba(168, 85, 247, 0.15)",
+          border: "1px solid rgba(74, 155, 127, 0.1)",
           opacity: decorOpacity,
           transform: `scale(${0.9 + Math.cos(frame * 0.04) * 0.08})`,
         }}
@@ -155,13 +158,13 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
               fontSize: 56,
               fontWeight: 700,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "white",
+              color: "#1A1A1A",
               margin: 0,
               textAlign: "center",
               letterSpacing: "-1px",
             }}
           >
-            Ready to Transform Your Workflow?
+            Ready to Transform Your Staffing?
           </h2>
         </div>
 
@@ -174,11 +177,11 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
           <div
             style={{
               padding: "24px 64px",
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
+              borderRadius: 50,
+              background: "linear-gradient(135deg, #E8705B 0%, #D65B47 100%)",
               boxShadow: `
-                0 20px 60px rgba(99, 102, 241, 0.4),
-                0 8px 20px rgba(0, 0, 0, 0.2),
+                0 20px 60px rgba(232, 112, 91, 0.35),
+                0 8px 20px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2)
               `,
               cursor: "pointer",
@@ -207,10 +210,10 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         >
           <p
             style={{
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: 400,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "rgba(255, 255, 255, 0.6)",
+              color: "#6A6A6A",
               margin: 0,
             }}
           >
@@ -227,7 +230,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
             opacity: subtextOpacity,
           }}
         >
-          {["10K+ Users", "99.9% Uptime", "24/7 Support"].map((text, i) => (
+          {["For Facilities", "For Nurses", "Real-Time Analytics"].map((text, i) => (
             <div
               key={i}
               style={{
@@ -238,10 +241,10 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
             >
               <div
                 style={{
-                  width: 8,
-                  height: 8,
+                  width: 10,
+                  height: 10,
                   borderRadius: "50%",
-                  background: "#10b981",
+                  background: "#4A9B7F",
                 }}
               />
               <span
@@ -249,13 +252,52 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
                   fontSize: 18,
                   fontWeight: 500,
                   fontFamily: "system-ui, -apple-system, sans-serif",
-                  color: "rgba(255, 255, 255, 0.5)",
+                  color: "#5A5A5A",
                 }}
               >
                 {text}
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Google rating badge */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            marginTop: 10,
+            opacity: subtextOpacity,
+            padding: "12px 24px",
+            background: "rgba(255, 255, 255, 0.7)",
+            borderRadius: 30,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 500,
+              fontFamily: "system-ui, -apple-system, sans-serif",
+              color: "#4A4A4A",
+            }}
+          >
+            Rating 4.7
+          </span>
+          <div style={{ display: "flex", gap: 2 }}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 4 ? "#FBBC05" : "#E0E0E0"}>
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            ))}
+          </div>
         </div>
       </div>
     </AbsoluteFill>

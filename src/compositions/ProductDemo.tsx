@@ -7,7 +7,7 @@ import { Background } from "../components/Background";
 export interface Feature {
   title: string;
   description: string;
-  icon: "zap" | "shield" | "chart";
+  icon: "zap" | "shield" | "chart" | "calendar" | "budget";
 }
 
 export interface ProductDemoProps {
