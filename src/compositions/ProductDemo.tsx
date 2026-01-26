@@ -10,39 +10,39 @@ import {
 import { Background } from "../components/Background";
 
 export const ProductDemo: React.FC = () => {
-  // Timing (18 seconds total at 30fps = 540 frames)
-  // Scene 1 - Logo Reveal: 0-2s
-  // Scene 2 - Hero "Get your shifts together": 2-5s
-  // Scene 3 - Scheduling Screen: 5-8.5s
-  // Scene 4 - Outcomes "Your SNF": 8.5-12s
-  // Scene 5 - Feature Cards: 12-16s
-  // Scene 6 - Thank You: 16-18s
+  // Timing (5 seconds total at 30fps = 150 frames)
+  // Scene 1 - Logo Reveal: 0-0.6s
+  // Scene 2 - Hero: 0.5-1.3s
+  // Scene 3 - Scheduling: 1.2-2.2s
+  // Scene 4 - Outcomes: 2.1-3.2s
+  // Scene 5 - Features: 3.1-4.2s
+  // Scene 6 - Thank You: 4.1-5s
 
   const FPS = 30;
 
-  // Scene 1: Logo Reveal (~2s)
+  // Scene 1: Logo Reveal (~0.6s)
   const LOGO_START = 0;
-  const LOGO_DURATION = FPS * 2; // 60 frames
+  const LOGO_DURATION = FPS * 0.7; // 21 frames
 
-  // Scene 2: Hero Screen (~3s)
-  const HERO_START = Math.floor(FPS * 1.8); // slight overlap
-  const HERO_DURATION = FPS * 3.2; // 96 frames
+  // Scene 2: Hero Screen (~0.8s)
+  const HERO_START = FPS * 0.5;
+  const HERO_DURATION = FPS * 0.9;
 
-  // Scene 3: Scheduling Screen (~3.5s)
-  const SCHEDULING_START = FPS * 5;
-  const SCHEDULING_DURATION = FPS * 3.5; // 105 frames
+  // Scene 3: Scheduling Screen (~1s)
+  const SCHEDULING_START = FPS * 1.2;
+  const SCHEDULING_DURATION = FPS * 1;
 
-  // Scene 4: Outcomes Screen (~3.5s)
-  const OUTCOMES_START = FPS * 8.5;
-  const OUTCOMES_DURATION = FPS * 3.5; // 105 frames
+  // Scene 4: Outcomes Screen (~1.1s)
+  const OUTCOMES_START = FPS * 2.1;
+  const OUTCOMES_DURATION = FPS * 1.1;
 
-  // Scene 5: Feature Cards (~4s)
-  const FEATURES_START = FPS * 12;
-  const FEATURES_DURATION = FPS * 4; // 120 frames
+  // Scene 5: Feature Cards (~1.1s)
+  const FEATURES_START = FPS * 3.1;
+  const FEATURES_DURATION = FPS * 1.1;
 
-  // Scene 6: Thank You (~2s)
-  const THANKYOU_START = FPS * 16;
-  const THANKYOU_DURATION = FPS * 2; // 60 frames
+  // Scene 6: Thank You (~0.9s)
+  const THANKYOU_START = FPS * 4.1;
+  const THANKYOU_DURATION = FPS * 0.9;
 
   return (
     <AbsoluteFill>
