@@ -74,17 +74,17 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
     extrapolateRight: "clamp",
   });
 
-  // Particles animation
-  const particles = Array.from({ length: 8 }, (_, i) => {
-    const angle = (i / 8) * Math.PI * 2;
-    const radius = 280 + Math.sin(frame * 0.1 + i) * 20;
-    const x = Math.cos(angle + frame * 0.01) * radius;
-    const y = Math.sin(angle + frame * 0.01) * radius;
-    const particleOpacity = interpolate(frame, [20 + i * 5, 40 + i * 5], [0, 0.5], {
+  // Particles animation - Blue themed
+  const particles = Array.from({ length: 10 }, (_, i) => {
+    const angle = (i / 10) * Math.PI * 2;
+    const radius = 300 + Math.sin(frame * 0.1 + i) * 25;
+    const x = Math.cos(angle + frame * 0.012) * radius;
+    const y = Math.sin(angle + frame * 0.012) * radius;
+    const particleOpacity = interpolate(frame, [15 + i * 4, 35 + i * 4], [0, 0.6], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
-    return { x, y, opacity: particleOpacity, size: 6 + (i % 3) * 2 };
+    return { x, y, opacity: particleOpacity, size: 8 + (i % 3) * 3 };
   });
 
   return (
@@ -95,7 +95,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         opacity: fadeIn,
       }}
     >
-      {/* Animated particles */}
+      {/* Animated particles - Blue themed */}
       {particles.map((particle, i) => (
         <div
           key={i}
@@ -104,22 +104,22 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
             width: particle.size,
             height: particle.size,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #6366f1, #a855f7)",
+            background: `linear-gradient(135deg, #3b82f6, #0ea5e9)`,
             transform: `translate(${particle.x}px, ${particle.y}px)`,
             opacity: particle.opacity,
-            boxShadow: "0 0 10px rgba(99, 102, 241, 0.5)",
+            boxShadow: "0 0 15px rgba(59, 130, 246, 0.4)",
           }}
         />
       ))}
 
-      {/* Glowing ring */}
+      {/* Glowing rings - Blue themed */}
       <div
         style={{
           position: "absolute",
-          width: 500,
-          height: 500,
+          width: 550,
+          height: 550,
           borderRadius: "50%",
-          border: "2px solid rgba(99, 102, 241, 0.2)",
+          border: "2px solid rgba(59, 130, 246, 0.15)",
           opacity: decorOpacity,
           transform: `scale(${0.8 + Math.sin(frame * 0.05) * 0.1})`,
         }}
@@ -127,45 +127,61 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
       <div
         style={{
           position: "absolute",
-          width: 600,
-          height: 600,
+          width: 650,
+          height: 650,
           borderRadius: "50%",
-          border: "1px solid rgba(168, 85, 247, 0.15)",
+          border: "1px solid rgba(14, 165, 233, 0.12)",
           opacity: decorOpacity,
           transform: `scale(${0.9 + Math.cos(frame * 0.04) * 0.08})`,
         }}
       />
-
       <div
         style={{
+          position: "absolute",
+          width: 450,
+          height: 450,
+          borderRadius: "50%",
+          border: "3px solid rgba(37, 99, 235, 0.08)",
+          opacity: decorOpacity,
+          transform: `scale(${0.7 + Math.sin(frame * 0.06) * 0.12})`,
+        }}
+      />
+
+      {/* CTA Card */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 32,
+          padding: "60px 80px",
+          boxShadow: "0 30px 80px rgba(0, 0, 0, 0.12), 0 10px 30px rgba(59, 130, 246, 0.15)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 40,
+          gap: 35,
         }}
       >
         {/* Main CTA Title */}
         <div
           style={{
-            transform: `translateY(${(1 - titleY) * 50}px) scale(${titleScale})`,
+            transform: `translateY(${(1 - titleY) * 40}px) scale(${titleScale})`,
           }}
         >
           <h2
             style={{
-              fontSize: 56,
+              fontSize: 52,
               fontWeight: 700,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "white",
+              color: "#1e293b",
               margin: 0,
               textAlign: "center",
               letterSpacing: "-1px",
             }}
           >
-            Ready to Transform Your Workflow?
+            Ready to Get Started?
           </h2>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button - Blue gradient */}
         <div
           style={{
             transform: `scale(${buttonScale * pulseScale})`,
@@ -173,12 +189,12 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         >
           <div
             style={{
-              padding: "24px 64px",
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
+              padding: "22px 60px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%)",
               boxShadow: `
-                0 20px 60px rgba(99, 102, 241, 0.4),
-                0 8px 20px rgba(0, 0, 0, 0.2),
+                0 20px 50px rgba(37, 99, 235, 0.35),
+                0 8px 20px rgba(59, 130, 246, 0.25),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2)
               `,
               cursor: "pointer",
@@ -186,7 +202,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
           >
             <span
               style={{
-                fontSize: 32,
+                fontSize: 30,
                 fontWeight: 600,
                 fontFamily: "system-ui, -apple-system, sans-serif",
                 color: "white",
@@ -202,15 +218,15 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         <div
           style={{
             opacity: subtextOpacity,
-            transform: `translateY(${(1 - subtextY) * 20}px)`,
+            transform: `translateY(${(1 - subtextY) * 15}px)`,
           }}
         >
           <p
             style={{
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 400,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "rgba(255, 255, 255, 0.6)",
+              color: "#64748b",
               margin: 0,
             }}
           >
@@ -222,12 +238,16 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
         <div
           style={{
             display: "flex",
-            gap: 60,
-            marginTop: 20,
+            gap: 50,
+            marginTop: 10,
             opacity: subtextOpacity,
           }}
         >
-          {["10K+ Users", "99.9% Uptime", "24/7 Support"].map((text, i) => (
+          {[
+            { text: "10K+ Users", icon: "users" },
+            { text: "99.9% Uptime", icon: "uptime" },
+            { text: "24/7 Support", icon: "support" },
+          ].map((item, i) => (
             <div
               key={i}
               style={{
@@ -238,21 +258,43 @@ export const CallToAction: React.FC<CallToActionProps> = ({ ctaText, ctaSubtext 
             >
               <div
                 style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: "#10b981",
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 18,
-                  fontWeight: 500,
-                  fontFamily: "system-ui, -apple-system, sans-serif",
-                  color: "rgba(255, 255, 255, 0.5)",
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: "#eff6ff",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                {text}
+                {item.icon === "users" && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                )}
+                {item.icon === "uptime" && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                )}
+                {item.icon === "support" && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                )}
+              </div>
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                  color: "#475569",
+                }}
+              >
+                {item.text}
               </span>
             </div>
           ))}

@@ -82,38 +82,40 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
           gap: 30,
         }}
       >
-        {/* Logo Icon */}
+        {/* Logo Icon - Modern blue gradient */}
         <div
           style={{
-            width: 140,
-            height: 140,
-            borderRadius: 32,
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
+            width: 150,
+            height: 150,
+            borderRadius: 36,
+            background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #0ea5e9 100%)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             transform: `scale(${logoScale}) rotate(${(1 - logoRotation) * -180}deg)`,
-            boxShadow: "0 25px 80px rgba(99, 102, 241, 0.4), 0 10px 30px rgba(139, 92, 246, 0.3)",
+            boxShadow: "0 30px 80px rgba(37, 99, 235, 0.35), 0 15px 40px rgba(59, 130, 246, 0.25)",
           }}
         >
-          {/* Abstract logo shape */}
-          <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
-            <path
-              d="M35 5L55 20V50L35 65L15 50V20L35 5Z"
-              stroke="white"
-              strokeWidth="3"
-              fill="none"
-            />
-            <path
-              d="M35 20L45 27V43L35 50L25 43V27L35 20Z"
-              fill="white"
-              opacity="0.9"
-            />
-            <circle cx="35" cy="35" r="6" fill="white" />
+          {/* Dashboard-style logo */}
+          <svg width="75" height="75" viewBox="0 0 75 75" fill="none">
+            {/* Outer dashboard frame */}
+            <rect x="10" y="10" width="55" height="55" rx="8" stroke="white" strokeWidth="2.5" fill="none" />
+            {/* Grid lines */}
+            <line x1="10" y1="30" x2="65" y2="30" stroke="white" strokeWidth="1.5" opacity="0.6" />
+            <line x1="35" y1="30" x2="35" y2="65" stroke="white" strokeWidth="1.5" opacity="0.6" />
+            {/* Chart bars */}
+            <rect x="17" y="42" width="8" height="16" rx="2" fill="white" opacity="0.9" />
+            <rect x="27" y="36" width="8" height="22" rx="2" fill="white" />
+            {/* Metrics circle */}
+            <circle cx="50" cy="47.5" r="12" stroke="white" strokeWidth="2" fill="none" />
+            <path d="M50 35.5 L50 47.5 L58 47.5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            {/* Top metrics dots */}
+            <circle cx="20" cy="20" r="4" fill="white" opacity="0.9" />
+            <rect x="28" y="17" width="25" height="6" rx="3" fill="white" opacity="0.7" />
           </svg>
         </div>
 
-        {/* Company Name */}
+        {/* Company Name - Blue text */}
         <div
           style={{
             opacity: nameOpacity,
@@ -122,20 +124,20 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
         >
           <h1
             style={{
-              fontSize: 82,
+              fontSize: 86,
               fontWeight: 700,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "white",
+              color: "#1e40af",
               margin: 0,
               letterSpacing: "-2px",
-              textShadow: "0 4px 30px rgba(99, 102, 241, 0.3)",
+              textShadow: "0 4px 30px rgba(37, 99, 235, 0.2)",
             }}
           >
             {companyName}
           </h1>
         </div>
 
-        {/* Tagline */}
+        {/* Tagline - Subtle blue */}
         <div
           style={{
             opacity: taglineOpacity,
@@ -144,10 +146,10 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
         >
           <p
             style={{
-              fontSize: 32,
+              fontSize: 34,
               fontWeight: 400,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "rgba(255, 255, 255, 0.7)",
+              color: "#64748b",
               margin: 0,
               letterSpacing: "0.5px",
             }}
