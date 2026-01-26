@@ -1,9 +1,64 @@
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
+import { COLORS } from "./Background";
 
 interface LogoProps {
   companyName: string;
   tagline: string;
 }
+
+// LaborRx Logo Icon - Cross-shaped overlapping ovals
+const LaborRxIcon: React.FC<{ scale: number; rotation: number }> = ({ scale, rotation }) => {
+  return (
+    <div
+      style={{
+        width: 160,
+        height: 160,
+        position: "relative",
+        transform: `scale(${scale}) rotate(${rotation}deg)`,
+      }}
+    >
+      {/* Horizontal oval */}
+      <div
+        style={{
+          position: "absolute",
+          width: 140,
+          height: 80,
+          left: 10,
+          top: 40,
+          borderRadius: "50%",
+          background: COLORS.primary,
+          opacity: 0.9,
+        }}
+      />
+      {/* Vertical oval */}
+      <div
+        style={{
+          position: "absolute",
+          width: 80,
+          height: 140,
+          left: 40,
+          top: 10,
+          borderRadius: "50%",
+          background: COLORS.primary,
+          opacity: 0.85,
+        }}
+      />
+      {/* Center intersection (darker) */}
+      <div
+        style={{
+          position: "absolute",
+          width: 60,
+          height: 60,
+          left: 50,
+          top: 50,
+          borderRadius: "50%",
+          background: COLORS.accent,
+          opacity: 0.7,
+        }}
+      />
+    </div>
+  );
+};
 
 export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
   const frame = useCurrentFrame();
@@ -31,13 +86,13 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
   });
 
   // Company name animation (starts after logo)
-  const nameOpacity = interpolate(frame, [20, 40], [0, 1], {
+  const nameOpacity = interpolate(frame, [25, 45], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const nameY = spring({
-    frame: frame - 20,
+  const nameX = spring({
+    frame: frame - 25,
     fps,
     config: {
       damping: 12,
@@ -46,13 +101,13 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
   });
 
   // Tagline animation (starts after company name)
-  const taglineOpacity = interpolate(frame, [45, 65], [0, 1], {
+  const taglineOpacity = interpolate(frame, [50, 70], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   const taglineY = spring({
-    frame: frame - 45,
+    frame: frame - 50,
     fps,
     config: {
       damping: 12,
@@ -79,60 +134,43 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 30,
+          gap: 40,
         }}
       >
-        {/* Logo Icon */}
+        {/* Logo with company name in horizontal layout */}
         <div
           style={{
-            width: 140,
-            height: 140,
-            borderRadius: 32,
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            transform: `scale(${logoScale}) rotate(${(1 - logoRotation) * -180}deg)`,
-            boxShadow: "0 25px 80px rgba(99, 102, 241, 0.4), 0 10px 30px rgba(139, 92, 246, 0.3)",
+            gap: 30,
           }}
         >
-          {/* Abstract logo shape */}
-          <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
-            <path
-              d="M35 5L55 20V50L35 65L15 50V20L35 5Z"
-              stroke="white"
-              strokeWidth="3"
-              fill="none"
-            />
-            <path
-              d="M35 20L45 27V43L35 50L25 43V27L35 20Z"
-              fill="white"
-              opacity="0.9"
-            />
-            <circle cx="35" cy="35" r="6" fill="white" />
-          </svg>
-        </div>
+          {/* Logo Icon */}
+          <LaborRxIcon
+            scale={logoScale}
+            rotation={(1 - logoRotation) * -180}
+          />
 
-        {/* Company Name */}
-        <div
-          style={{
-            opacity: nameOpacity,
-            transform: `translateY(${(1 - nameY) * 30}px)`,
-          }}
-        >
-          <h1
+          {/* Company Name */}
+          <div
             style={{
-              fontSize: 82,
-              fontWeight: 700,
-              fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "white",
-              margin: 0,
-              letterSpacing: "-2px",
-              textShadow: "0 4px 30px rgba(99, 102, 241, 0.3)",
+              opacity: nameOpacity,
+              transform: `translateX(${(1 - nameX) * 50}px)`,
             }}
           >
-            {companyName}
-          </h1>
+            <h1
+              style={{
+                fontSize: 96,
+                fontWeight: 700,
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                color: COLORS.secondary,
+                margin: 0,
+                letterSpacing: "-3px",
+              }}
+            >
+              Labor<span style={{ fontWeight: 700 }}>Rx</span>
+            </h1>
+          </div>
         </div>
 
         {/* Tagline */}
@@ -144,10 +182,10 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
         >
           <p
             style={{
-              fontSize: 32,
+              fontSize: 36,
               fontWeight: 400,
               fontFamily: "system-ui, -apple-system, sans-serif",
-              color: "rgba(255, 255, 255, 0.7)",
+              color: COLORS.textLight,
               margin: 0,
               letterSpacing: "0.5px",
             }}
