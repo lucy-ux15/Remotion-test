@@ -1,124 +1,141 @@
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
 import { COLORS } from "./Background";
 
 interface LogoProps {
-  companyName: string;
-  tagline: string;
+  fadeOut?: boolean;
+  fadeOutStart?: number;
 }
 
 // LaborRx Logo Icon - Cross-shaped overlapping ovals
-const LaborRxIcon: React.FC<{ scale: number; rotation: number }> = ({ scale, rotation }) => {
+const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => {
+  const scale = size / 80;
   return (
     <div
       style={{
-        width: 160,
-        height: 160,
+        width: size,
+        height: size,
         position: "relative",
-        transform: `scale(${scale}) rotate(${rotation}deg)`,
+        transform: `scale(${scale})`,
       }}
     >
       {/* Horizontal oval */}
       <div
         style={{
           position: "absolute",
-          width: 140,
-          height: 80,
-          left: 10,
-          top: 40,
+          width: 70,
+          height: 40,
+          left: 5,
+          top: 20,
           borderRadius: "50%",
           background: COLORS.primary,
-          opacity: 0.9,
+          opacity: 0.95,
         }}
       />
       {/* Vertical oval */}
       <div
         style={{
           position: "absolute",
-          width: 80,
-          height: 140,
-          left: 40,
-          top: 10,
+          width: 40,
+          height: 70,
+          left: 20,
+          top: 5,
           borderRadius: "50%",
           background: COLORS.primary,
-          opacity: 0.85,
+          opacity: 0.9,
         }}
       />
       {/* Center intersection (darker) */}
       <div
         style={{
           position: "absolute",
-          width: 60,
-          height: 60,
-          left: 50,
-          top: 50,
+          width: 30,
+          height: 30,
+          left: 25,
+          top: 25,
           borderRadius: "50%",
           background: COLORS.accent,
-          opacity: 0.7,
+          opacity: 0.75,
         }}
       />
     </div>
   );
 };
 
-export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
+export const Logo: React.FC<LogoProps> = ({ fadeOut = true, fadeOutStart = 70 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Logo icon animation
-  const logoScale = spring({
-    frame,
-    fps,
-    config: {
-      damping: 12,
-      stiffness: 100,
-      mass: 0.8,
-    },
-  });
-
-  const logoRotation = spring({
-    frame,
-    fps,
-    config: {
-      damping: 15,
-      stiffness: 80,
-      mass: 1,
-    },
-  });
-
-  // Company name animation (starts after logo)
-  const nameOpacity = interpolate(frame, [25, 45], [0, 1], {
+  // Gentle ease-out for opacity: 0 to 1 over ~1 second
+  const fadeIn = interpolate(frame, [0, fps * 0.8], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
   });
 
-  const nameX = spring({
-    frame: frame - 25,
-    fps,
-    config: {
-      damping: 12,
-      stiffness: 100,
-    },
-  });
-
-  // Tagline animation (starts after company name)
-  const taglineOpacity = interpolate(frame, [50, 70], [0, 1], {
+  // Gentle scale: 98% to 100% with ease-out
+  const scale = interpolate(frame, [0, fps * 1], [0.98, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
   });
 
-  const taglineY = spring({
-    frame: frame - 50,
-    fps,
-    config: {
-      damping: 12,
-      stiffness: 100,
-    },
-  });
+  // Fade out at end if enabled
+  const fadeOutOpacity = fadeOut
+    ? interpolate(frame, [fadeOutStart, fadeOutStart + 15], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.in(Easing.cubic),
+      })
+    : 1;
 
-  // Fade out at the end
-  const fadeOut = interpolate(frame, [130, 150], [1, 0], {
+  const opacity = fadeIn * fadeOutOpacity;
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        opacity,
+        transform: `scale(${scale})`,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 20,
+        }}
+      >
+        {/* Logo Icon */}
+        <LaborRxIcon size={100} />
+
+        {/* Company Name */}
+        <h1
+          style={{
+            fontSize: 72,
+            fontWeight: 700,
+            fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+            color: COLORS.secondary,
+            margin: 0,
+            letterSpacing: "-2px",
+          }}
+        >
+          LaborRx
+        </h1>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Smaller logo for outro
+export const LogoSmall: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  // Fade in
+  const opacity = interpolate(frame, [0, 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
   });
 
   return (
@@ -126,73 +143,29 @@ export const Logo: React.FC<LogoProps> = ({ companyName, tagline }) => {
       style={{
         justifyContent: "center",
         alignItems: "center",
-        opacity: fadeOut,
+        opacity,
       }}
     >
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          gap: 40,
+          gap: 16,
         }}
       >
-        {/* Logo with company name in horizontal layout */}
-        <div
+        <LaborRxIcon size={60} />
+        <h1
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 30,
+            fontSize: 48,
+            fontWeight: 700,
+            fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+            color: COLORS.secondary,
+            margin: 0,
+            letterSpacing: "-1.5px",
           }}
         >
-          {/* Logo Icon */}
-          <LaborRxIcon
-            scale={logoScale}
-            rotation={(1 - logoRotation) * -180}
-          />
-
-          {/* Company Name */}
-          <div
-            style={{
-              opacity: nameOpacity,
-              transform: `translateX(${(1 - nameX) * 50}px)`,
-            }}
-          >
-            <h1
-              style={{
-                fontSize: 96,
-                fontWeight: 700,
-                fontFamily: "system-ui, -apple-system, sans-serif",
-                color: COLORS.secondary,
-                margin: 0,
-                letterSpacing: "-3px",
-              }}
-            >
-              Labor<span style={{ fontWeight: 700 }}>Rx</span>
-            </h1>
-          </div>
-        </div>
-
-        {/* Tagline */}
-        <div
-          style={{
-            opacity: taglineOpacity,
-            transform: `translateY(${(1 - taglineY) * 20}px)`,
-          }}
-        >
-          <p
-            style={{
-              fontSize: 36,
-              fontWeight: 400,
-              fontFamily: "system-ui, -apple-system, sans-serif",
-              color: COLORS.textLight,
-              margin: 0,
-              letterSpacing: "0.5px",
-            }}
-          >
-            {tagline}
-          </p>
-        </div>
+          LaborRx
+        </h1>
       </div>
     </AbsoluteFill>
   );

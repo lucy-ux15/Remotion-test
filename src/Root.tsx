@@ -3,7 +3,7 @@ import { ProductDemo } from "./compositions/ProductDemo";
 
 // Video settings
 const FPS = 30;
-const DURATION_SECONDS = 30;
+const DURATION_SECONDS = 10; // 10 second teaser video
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -15,12 +15,6 @@ export const RemotionRoot: React.FC = () => {
         fps={FPS}
         width={1920}
         height={1080}
-        defaultProps={{
-          companyName: "LaborRx",
-          tagline: "Smart Staffing for Healthcare",
-          ctaText: "Book your Free Demo",
-          ctaSubtext: "Zero commitment",
-        }}
       />
     </>
   );

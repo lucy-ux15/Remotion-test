@@ -3,22 +3,26 @@ import { AbsoluteFill, useCurrentFrame, interpolate } from "remotion";
 // LaborRx Brand Colors
 export const COLORS = {
   primary: "#E86A4F", // Coral/orange-red
+  primaryLight: "#F5A08E", // Light coral
   secondary: "#2D2D2D", // Dark gray/black
   background: "#F5F1EB", // Cream/beige
-  backgroundDark: "#EDE8E0",
+  backgroundWarm: "#FDF6F0", // Warm off-white
+  backgroundPeach: "#FDEEE8", // Soft peach
   accent: "#E85A3F", // Darker coral
   success: "#4CAF50", // Green for checkmarks
   error: "#E53935", // Red for X marks
   text: "#2D2D2D",
   textLight: "#666666",
+  textMuted: "#999999",
   white: "#FFFFFF",
+  cardShadow: "rgba(232, 106, 79, 0.08)",
 };
 
 export const Background: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // Subtle gradient animation
-  const gradientPosition = interpolate(frame, [0, 900], [0, 100], {
+  // Very subtle gradient shift
+  const gradientAngle = interpolate(frame, [0, 360], [135, 140], {
     extrapolateRight: "clamp",
   });
 
@@ -26,63 +30,55 @@ export const Background: React.FC = () => {
     <AbsoluteFill
       style={{
         background: `linear-gradient(
-          ${135 + gradientPosition * 0.15}deg,
-          ${COLORS.background} 0%,
-          ${COLORS.backgroundDark} 40%,
+          ${gradientAngle}deg,
+          ${COLORS.backgroundWarm} 0%,
+          ${COLORS.backgroundPeach} 35%,
           ${COLORS.background} 70%,
-          #F8F4EE 100%
+          ${COLORS.backgroundWarm} 100%
         )`,
       }}
     >
-      {/* Animated gradient orbs with brand colors */}
+      {/* Soft ambient glow - top left */}
       <div
         style={{
           position: "absolute",
-          top: "15%",
-          left: "5%",
-          width: 700,
-          height: 700,
+          top: "-10%",
+          left: "-5%",
+          width: 800,
+          height: 800,
           borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(232, 106, 79, 0.08) 0%, transparent 70%)`,
-          transform: `translate(${Math.sin(frame / 80) * 40}px, ${Math.cos(frame / 100) * 30}px)`,
-          filter: "blur(60px)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "5%",
-          right: "10%",
-          width: 600,
-          height: 600,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(232, 106, 79, 0.06) 0%, transparent 70%)`,
-          transform: `translate(${Math.cos(frame / 90) * 35}px, ${Math.sin(frame / 110) * 25}px)`,
-          filter: "blur(70px)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          right: "25%",
-          width: 500,
-          height: 500,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(45, 45, 45, 0.03) 0%, transparent 70%)`,
-          transform: `translate(${Math.sin(frame / 70) * 25}px, ${Math.cos(frame / 80) * 35}px)`,
-          filter: "blur(50px)",
+          background: `radial-gradient(circle, rgba(232, 106, 79, 0.06) 0%, transparent 60%)`,
+          filter: "blur(80px)",
+          transform: `translate(${Math.sin(frame / 120) * 20}px, ${Math.cos(frame / 150) * 15}px)`,
         }}
       />
 
-      {/* Subtle dot pattern */}
+      {/* Soft ambient glow - bottom right */}
       <div
         style={{
           position: "absolute",
-          inset: 0,
-          backgroundImage: `radial-gradient(${COLORS.secondary}10 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-          opacity: 0.3,
+          bottom: "-15%",
+          right: "-10%",
+          width: 900,
+          height: 900,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(245, 160, 142, 0.08) 0%, transparent 55%)`,
+          filter: "blur(100px)",
+          transform: `translate(${Math.cos(frame / 100) * 15}px, ${Math.sin(frame / 130) * 20}px)`,
+        }}
+      />
+
+      {/* Center subtle glow */}
+      <div
+        style={{
+          position: "absolute",
+          top: "30%",
+          left: "40%",
+          width: 600,
+          height: 600,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(253, 238, 232, 0.5) 0%, transparent 50%)`,
+          filter: "blur(60px)",
         }}
       />
     </AbsoluteFill>
