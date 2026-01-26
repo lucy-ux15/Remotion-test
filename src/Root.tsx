@@ -16,27 +16,10 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          companyName: "TechFlow",
-          tagline: "Streamline Your Workflow",
-          features: [
-            {
-              title: "Lightning Fast",
-              description: "Process data 10x faster with our optimized engine",
-              icon: "zap",
-            },
-            {
-              title: "Secure by Design",
-              description: "Enterprise-grade security built into every layer",
-              icon: "shield",
-            },
-            {
-              title: "Smart Analytics",
-              description: "AI-powered insights that drive real results",
-              icon: "chart",
-            },
-          ],
-          ctaText: "Start Free Trial",
-          ctaSubtext: "No credit card required",
+          companyName: "LaborRx",
+          tagline: "Smart Staffing for Healthcare",
+          ctaText: "Book your Free Demo",
+          ctaSubtext: "Zero commitment",
         }}
       />
     </>
