@@ -1,43 +1,20 @@
 import { Composition } from "remotion";
-import { ProductDemo } from "./compositions/ProductDemo";
+import { LaborRxTeaser } from "./compositions/LaborRxTeaser";
 
-// Video settings
+// Video settings - 7 seconds at 30fps
 const FPS = 30;
-const DURATION_SECONDS = 30;
+const DURATION_SECONDS = 7;
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
-        id="ProductDemo"
-        component={ProductDemo}
+        id="LaborRxTeaser"
+        component={LaborRxTeaser}
         durationInFrames={FPS * DURATION_SECONDS}
         fps={FPS}
         width={1920}
         height={1080}
-        defaultProps={{
-          companyName: "TechFlow",
-          tagline: "Streamline Your Workflow",
-          features: [
-            {
-              title: "Lightning Fast",
-              description: "Process data 10x faster with our optimized engine",
-              icon: "zap",
-            },
-            {
-              title: "Secure by Design",
-              description: "Enterprise-grade security built into every layer",
-              icon: "shield",
-            },
-            {
-              title: "Smart Analytics",
-              description: "AI-powered insights that drive real results",
-              icon: "chart",
-            },
-          ],
-          ctaText: "Start Free Trial",
-          ctaSubtext: "No credit card required",
-        }}
       />
     </>
   );

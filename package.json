@@ -1,11 +1,11 @@
 {
-  "name": "product-demo-video",
+  "name": "laborrx-teaser-video",
   "version": "1.0.0",
-  "description": "A 30-second product demo video built with Remotion",
+  "description": "A 7-second LaborRx product teaser video built with Remotion",
   "scripts": {
     "start": "remotion studio",
-    "build": "remotion render ProductDemo out/video.mp4",
-    "render": "remotion render ProductDemo out/video.mp4",
+    "build": "remotion render LaborRxTeaser out/laborrx-teaser.mp4",
+    "render": "remotion render LaborRxTeaser out/laborrx-teaser.mp4",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
