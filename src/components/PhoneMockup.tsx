@@ -4,32 +4,35 @@ import { COLORS } from "./Background";
 
 interface PhoneMockupProps {
   children: React.ReactNode;
-  slideFrom?: "right" | "bottom";
+  slideFrom?: "bottom" | "none";
   delay?: number;
+  offsetX?: number;
 }
 
 export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   children,
-  slideFrom = "right",
+  slideFrom = "bottom",
   delay = 0,
+  offsetX = 0,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Spring animation for slide-in with low damping for smooth motion
+  // Spring animation for slide-in with low damping
   const slideProgress = spring({
     frame: frame - delay,
     fps,
     config: {
-      damping: 18,
+      damping: 20,
       stiffness: 80,
       mass: 1,
     },
   });
 
-  // Calculate transform based on slide direction
-  const translateX = slideFrom === "right" ? interpolate(slideProgress, [0, 1], [400, 0]) : 0;
-  const translateY = slideFrom === "bottom" ? interpolate(slideProgress, [0, 1], [300, 0]) : 0;
+  // Calculate transform
+  const translateY = slideFrom === "bottom"
+    ? interpolate(slideProgress, [0, 1], [250, 0])
+    : 0;
 
   // Opacity fade in
   const opacity = interpolate(frame - delay, [0, 15], [0, 1], {
@@ -41,22 +44,22 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   return (
     <div
       style={{
-        transform: `translate(${translateX}px, ${translateY}px)`,
+        transform: `translateY(${translateY}px) translateX(${offsetX}px)`,
         opacity,
       }}
     >
       {/* Phone Frame */}
       <div
         style={{
-          width: 380,
-          height: 780,
+          width: 340,
+          height: 700,
           backgroundColor: "#1a1a1a",
-          borderRadius: 50,
-          padding: 12,
+          borderRadius: 45,
+          padding: 10,
           boxShadow: `
-            0 50px 100px rgba(0, 0, 0, 0.15),
-            0 20px 40px rgba(0, 0, 0, 0.1),
-            inset 0 0 0 2px rgba(255, 255, 255, 0.1)
+            0 40px 80px rgba(0, 0, 0, 0.12),
+            0 16px 32px rgba(0, 0, 0, 0.08),
+            inset 0 0 0 1.5px rgba(255, 255, 255, 0.1)
           `,
         }}
       >
@@ -66,7 +69,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
             width: "100%",
             height: "100%",
             backgroundColor: COLORS.white,
-            borderRadius: 40,
+            borderRadius: 36,
             overflow: "hidden",
             position: "relative",
           }}
@@ -78,11 +81,11 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
               top: 0,
               left: "50%",
               transform: "translateX(-50%)",
-              width: 150,
-              height: 35,
+              width: 120,
+              height: 30,
               backgroundColor: "#1a1a1a",
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
+              borderBottomLeftRadius: 16,
+              borderBottomRightRadius: 16,
               zIndex: 10,
             }}
           />
@@ -103,7 +106,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   );
 };
 
-// Floating UI Card component
+// Floating UI Card component with staggered animation
 interface FloatingCardProps {
   children: React.ReactNode;
   delay?: number;
@@ -122,8 +125,8 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Staggered fade-in with translate up
-  const opacity = interpolate(frame - delay, [0, 12], [0, 1], {
+  // Staggered fade-in with translate up (120ms stagger = ~4 frames)
+  const opacity = interpolate(frame - delay, [0, 10], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
@@ -133,18 +136,13 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
     frame: frame - delay,
     fps,
     config: {
-      damping: 15,
-      stiffness: 100,
-      mass: 0.8,
+      damping: 18,
+      stiffness: 120,
+      mass: 0.6,
     },
   });
 
-  const yOffset = interpolate(translateY, [0, 1], [20, 0]);
-
-  // Subtle floating animation after appearing
-  const floatOffset = frame > delay + 20
-    ? Math.sin((frame - delay - 20) / 30) * 3
-    : 0;
+  const yOffset = interpolate(translateY, [0, 1], [12, 0]);
 
   return (
     <div
@@ -154,13 +152,13 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
         top: y,
         width,
         opacity,
-        transform: `translateY(${yOffset + floatOffset}px)`,
+        transform: `translateY(${yOffset}px)`,
         backgroundColor: COLORS.white,
-        borderRadius: 16,
-        padding: "12px 16px",
+        borderRadius: 14,
+        padding: "10px 14px",
         boxShadow: `
-          0 10px 40px rgba(0, 0, 0, 0.08),
-          0 4px 12px rgba(0, 0, 0, 0.04)
+          0 8px 30px rgba(0, 0, 0, 0.06),
+          0 2px 8px rgba(0, 0, 0, 0.04)
         `,
       }}
     >

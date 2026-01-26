@@ -3,7 +3,7 @@ import { ProductDemo } from "./compositions/ProductDemo";
 
 // Video settings
 const FPS = 30;
-const DURATION_SECONDS = 10; // 10 second teaser video
+const DURATION_SECONDS = 7; // 7 second teaser video
 
 export const RemotionRoot: React.FC = () => {
   return (
