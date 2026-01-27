@@ -6,6 +6,7 @@
     "start": "remotion studio",
     "build": "remotion render ProductDemo out/video.mp4",
     "render": "remotion render ProductDemo out/video.mp4",
+    "render:laborrx": "remotion render LaborRxStory out/laborrx-story.mp4",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
