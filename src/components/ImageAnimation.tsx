@@ -1,88 +1,55 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, Easing, Img, staticFile } from "remotion";
 
 // ============================================
-// EASING FUNCTIONS (as specified)
+// EASING FUNCTIONS
 // ============================================
 const easeOutSmooth = Easing.bezier(0.16, 1, 0.3, 1);
 const easeOutBounce = Easing.bezier(0.34, 1.56, 0.64, 1);
 const easeInSmooth = Easing.bezier(0.7, 0, 0.84, 0);
 const easeSine = Easing.bezier(0.45, 0, 0.55, 1);
 
-// Image paths from public folder
-const IMAGES = {
-  logo: staticFile("images/logo.png"),
-  hero: staticFile("images/hero-phone.png"),
-  comparison: staticFile("images/comparison-cards.png"),
-  dashboard: staticFile("images/dashboard-reports.png"),
-  features: staticFile("images/feature-grid.png"),
-};
-
 // ============================================
-// SCENE 1: Logo Intro (0s - 2s / Frames 0-120)
-// Full screen logo image with fade, pulse, and zoom-out
+// SCENE 1: Logo (0-2s / 0-120 frames)
+// Uses: logo.png - beige background with LaborRx logo
 // ============================================
 export const LogoImageScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // 0-18 frames: Fade in from 0 to 1 + scale from 0.95 to 1.0
+  // 0-18 frames: Fade in
   const fadeIn = interpolate(frame, [0, 18], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // 102-120 frames: Scale up to 1.3 + fade out
+  // 18-102: Pulse 1.0 → 1.02 → 1.0
+  const pulsePhase = ((frame - 18) / 120) * Math.PI * 2;
+  const pulse = frame >= 18 && frame < 102 ? 1 + 0.02 * Math.sin(pulsePhase) : 1;
+
+  // 102-120: Zoom to 1.2 + fade out
+  const exitScale = interpolate(frame, [102, 120], [1, 1.2], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.ease),
+  });
+
   const fadeOut = interpolate(frame, [102, 120], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.ease),
   });
 
-  // Combined opacity
   const opacity = frame < 102 ? fadeIn : fadeIn * fadeOut;
-
-  // 18-102 frames: Subtle pulse 1.0 → 1.02 → 1.0 using sine wave
-  const pulsePhase = ((frame - 18) / 120) * Math.PI * 2;
-  const pulse = frame >= 18 && frame < 102
-    ? 1 + 0.02 * Math.sin(pulsePhase)
-    : 1;
-
-  // Scale: 0.95 → 1.0 for entrance, then pulse, then 1.0 → 1.3 for exit
-  const entranceScale = interpolate(frame, [0, 18], [0.95, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
-
-  const exitScale = interpolate(frame, [102, 120], [1, 1.3], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.ease),
-  });
-
-  let scale: number;
-  if (frame < 18) {
-    scale = entranceScale;
-  } else if (frame < 102) {
-    scale = pulse;
-  } else {
-    scale = exitScale;
-  }
+  const scale = frame < 102 ? pulse : exitScale;
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#E8E4DD", // Beige background matching logo image
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#E8E4DD" }}>
       <Img
-        src={IMAGES.logo}
+        src={staticFile("images/logo.png")}
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
+          objectFit: "cover",
           opacity,
           transform: `scale(${scale})`,
         }}
@@ -92,13 +59,13 @@ export const LogoImageScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 2: Hero Screen (2s - 4.5s / Frames 0-150 local)
-// Full screen hero image with slide up, float, and exit
+// SCENE 2: Hero with Phone (2-4.5s / 0-150 frames local)
+// Uses: hero.png - white bg with phone mockup and UI cards
 // ============================================
 export const HeroImageScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // 0-30 frames: Fade in + slide up from Y:50px + scale 0.95 → 1.0
+  // 0-30: Slide up from Y:50px + fade in
   const fadeIn = interpolate(frame, [0, 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -111,51 +78,29 @@ export const HeroImageScene: React.FC = () => {
     easing: easeOutBounce,
   });
 
-  const entranceScale = interpolate(frame, [0, 30], [0.95, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
+  // 30-138: Float ±3px
+  const floatY = frame >= 30 && frame < 138 ? Math.sin((frame - 30) * 0.05) * 3 : 0;
 
-  // 30-138 frames: Hold with continuous float ±3px
-  const floatY = frame >= 30 && frame < 138
-    ? Math.sin((frame - 30) * 0.05) * 3
-    : 0;
-
-  // 138-150 frames: Scale down to 0.95 + fade out
+  // 138-150: Fade out
   const fadeOut = interpolate(frame, [138, 150], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
   });
 
-  const exitScale = interpolate(frame, [138, 150], [1, 0.95], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeInSmooth,
-  });
-
-  // Combined values
   const opacity = frame < 138 ? fadeIn : fadeIn * fadeOut;
   const translateY = frame < 30 ? slideY : floatY;
-  const scale = frame < 30 ? entranceScale : (frame >= 138 ? exitScale : 1);
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#FDF8F5", // Warm background
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#FFFFFF" }}>
       <Img
-        src={IMAGES.hero}
+        src={staticFile("images/hero.png")}
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
+          objectFit: "cover",
           opacity,
-          transform: `translateY(${translateY}px) scale(${scale})`,
+          transform: `translateY(${translateY}px)`,
         }}
       />
     </AbsoluteFill>
@@ -163,13 +108,13 @@ export const HeroImageScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 3: Comparison Cards (4.5s - 6.5s / Frames 0-120 local)
-// Full screen comparison with entrance, float, and slide-up exit
+// SCENE 3: Comparison Cards (4.5-6.5s / 0-120 frames local)
+// Uses: comparison.png - Reactive vs Proactive cards
 // ============================================
 export const ComparisonImageScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // 0-30 frames: Fade in + slide up from Y:40px + scale 0.9 → 1.0 + rotate 2deg → 0deg
+  // 0-30: Slide up + fade in + rotate 2deg → 0
   const fadeIn = interpolate(frame, [0, 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -182,25 +127,17 @@ export const ComparisonImageScene: React.FC = () => {
     easing: easeOutBounce,
   });
 
-  const entranceScale = interpolate(frame, [0, 30], [0.9, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutBounce,
-  });
-
   const rotation = interpolate(frame, [0, 30], [2, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutBounce,
   });
 
-  // 30-108 frames: Hold with float ±2px
-  const floatY = frame >= 30 && frame < 108
-    ? Math.sin((frame - 30) * 0.04) * 2
-    : 0;
+  // 30-108: Float ±2px
+  const floatY = frame >= 30 && frame < 108 ? Math.sin((frame - 30) * 0.04) * 2 : 0;
 
-  // 108-120 frames: Slide up Y: 0 → -100px + fade out
-  const exitY = interpolate(frame, [108, 120], [0, -100], {
+  // 108-120: Slide up -50px + fade out
+  const exitY = interpolate(frame, [108, 120], [0, -50], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
@@ -212,35 +149,23 @@ export const ComparisonImageScene: React.FC = () => {
     easing: easeInSmooth,
   });
 
-  // Combined values
   const opacity = frame < 108 ? fadeIn : fadeIn * fadeOut;
   let translateY: number;
-  if (frame < 30) {
-    translateY = slideY;
-  } else if (frame < 108) {
-    translateY = floatY;
-  } else {
-    translateY = exitY;
-  }
-  const scale = frame < 30 ? entranceScale : 1;
+  if (frame < 30) translateY = slideY;
+  else if (frame < 108) translateY = floatY;
+  else translateY = exitY;
   const rotate = frame < 30 ? rotation : 0;
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#F8F6F2", // Light warm background
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#F8F6F2" }}>
       <Img
-        src={IMAGES.comparison}
+        src={staticFile("images/comparison.png")}
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
+          objectFit: "cover",
           opacity,
-          transform: `translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+          transform: `translateY(${translateY}px) rotate(${rotate}deg)`,
         }}
       />
     </AbsoluteFill>
@@ -248,13 +173,13 @@ export const ComparisonImageScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 4: Dashboard Reports (6.5s - 8.5s / Frames 0-120 local)
-// Full screen dashboard with slide up, shimmer, and zoom-in exit
+// SCENE 4: Dashboard Reports (6.5-8.5s / 0-120 frames local)
+// Uses: dashboard.png - Reports dashboard
 // ============================================
 export const DashboardImageScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // 0-30 frames: Fade in + slide up from Y:60px + scale 0.92 → 1.0
+  // 0-30: Slide up + fade in + scale 0.95 → 1.0
   const fadeIn = interpolate(frame, [0, 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -267,19 +192,14 @@ export const DashboardImageScene: React.FC = () => {
     easing: easeOutBounce,
   });
 
-  const entranceScale = interpolate(frame, [0, 30], [0.92, 1], {
+  const entranceScale = interpolate(frame, [0, 30], [0.95, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-    easing: easeOutBounce,
+    easing: easeOutSmooth,
   });
 
-  // 30-108 frames: Hold with subtle shimmer (opacity 1.0 to 0.98)
-  const shimmer = frame >= 30 && frame < 108
-    ? 1 - 0.02 * Math.sin((frame - 30) * 0.08)
-    : 1;
-
-  // 108-120 frames: Scale up to 1.1 (zoom in) + fade out
-  const exitScale = interpolate(frame, [108, 120], [1, 1.1], {
+  // 108-120: Zoom to 1.15 + fade out
+  const exitScale = interpolate(frame, [108, 120], [1, 1.15], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
@@ -291,33 +211,18 @@ export const DashboardImageScene: React.FC = () => {
     easing: easeInSmooth,
   });
 
-  // Combined values
-  let opacity: number;
-  if (frame < 30) {
-    opacity = fadeIn;
-  } else if (frame < 108) {
-    opacity = shimmer;
-  } else {
-    opacity = fadeOut;
-  }
-
+  const opacity = frame < 108 ? fadeIn : fadeIn * fadeOut;
   const translateY = frame < 30 ? slideY : 0;
   const scale = frame < 30 ? entranceScale : (frame >= 108 ? exitScale : 1);
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#FDF8F5", // Warm cream background
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#FDF8F5" }}>
       <Img
-        src={IMAGES.dashboard}
+        src={staticFile("images/dashboard.png")}
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
+          objectFit: "cover",
           opacity,
           transform: `translateY(${translateY}px) scale(${scale})`,
         }}
@@ -327,20 +232,20 @@ export const DashboardImageScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 5: Feature Grid Finale (8.5s - 10s / Frames 0-90 local)
-// Full screen feature grid with dramatic entrance and final glow
+// SCENE 5: Feature Grid (8.5-10s / 0-90 frames local)
+// Uses: features.png - Four feature cards
 // ============================================
 export const FeaturesImageScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // 0-30 frames: Fade in + scale 0.85 → 1.0 + rotate -3deg → 0deg
+  // 0-30: Zoom in + fade in + rotate -3deg → 0
   const fadeIn = interpolate(frame, [0, 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const entranceScale = interpolate(frame, [0, 30], [0.85, 1], {
+  const entranceScale = interpolate(frame, [0, 30], [0.9, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutBounce,
@@ -352,96 +257,42 @@ export const FeaturesImageScene: React.FC = () => {
     easing: easeOutBounce,
   });
 
-  // 30-72 frames: Hold with breathing (scale 1.0 → 1.005) + float ±2px
-  const breathe = frame >= 30 && frame < 72
-    ? 1 + 0.005 * Math.sin((frame - 30) * 0.1)
-    : 1;
+  // 30-72: Breathing scale 1.0 → 1.01 → 1.0
+  const breathe = frame >= 30 && frame < 72 ? 1 + 0.01 * Math.sin((frame - 30) * 0.1) : 1;
 
-  const floatY = frame >= 30 && frame < 72
-    ? Math.sin((frame - 30) * 0.08) * 2
-    : 0;
-
-  // 72-90 frames: Final scale to 1.02 + brightness glow
-  const finalScale = interpolate(frame, [72, 90], [1, 1.02], {
+  // 72-90: Final zoom to 1.03
+  const finalScale = interpolate(frame, [72, 90], [1, 1.03], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeSine,
   });
 
-  const brightness = interpolate(frame, [72, 81, 90], [1, 1.05, 1.02], {
+  const brightness = interpolate(frame, [72, 81, 90], [1, 1.03, 1.01], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Combined values
-  const opacity = fadeIn; // No fade out - hold on final frame
   let scale: number;
-  let translateY: number;
-  let rotate: number;
+  if (frame < 30) scale = entranceScale;
+  else if (frame < 72) scale = breathe;
+  else scale = finalScale;
 
-  if (frame < 30) {
-    scale = entranceScale;
-    translateY = 0;
-    rotate = rotation;
-  } else if (frame < 72) {
-    scale = breathe;
-    translateY = floatY;
-    rotate = 0;
-  } else {
-    scale = finalScale;
-    translateY = 0;
-    rotate = 0;
-  }
-
+  const rotate = frame < 30 ? rotation : 0;
   const filter = frame >= 72 ? `brightness(${brightness})` : "brightness(1)";
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#FFFFFF", // White background
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#FFFFFF" }}>
       <Img
-        src={IMAGES.features}
+        src={staticFile("images/features.png")}
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "contain",
-          opacity,
-          transform: `translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`,
+          objectFit: "cover",
+          opacity: fadeIn,
+          transform: `scale(${scale}) rotate(${rotate}deg)`,
           filter,
         }}
       />
     </AbsoluteFill>
-  );
-};
-
-// ============================================
-// TRANSITION OVERLAY COMPONENT
-// Subtle white flash between scenes
-// ============================================
-export const TransitionFlash: React.FC<{ startFrame: number }> = ({ startFrame }) => {
-  const frame = useCurrentFrame();
-
-  const opacity = interpolate(
-    frame,
-    [startFrame - 2, startFrame, startFrame + 2],
-    [0, 0.15, 0],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }
-  );
-
-  return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "white",
-        opacity,
-        pointerEvents: "none",
-      }}
-    />
   );
 };
