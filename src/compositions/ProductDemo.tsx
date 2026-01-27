@@ -1,3 +1,4 @@
+import React from "react";
 import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 import { Logo } from "../components/Logo";
 import { FeatureHighlight } from "../components/FeatureHighlight";
