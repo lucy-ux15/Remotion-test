@@ -1,12 +1,14 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, Easing, spring, useVideoConfig } from "remotion";
 import { COLORS } from "./Background";
 
+// Custom easing for smooth transitions
+const smoothEase = Easing.bezier(0.16, 1, 0.3, 1);
+
 // ============================================
-// LaborRx Logo Icon Component (matches screenshot exactly)
+// LaborRx Logo Icon (exact match to screenshot)
 // ============================================
 const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
   <div style={{ width: size, height: size, position: "relative" }}>
-    {/* Horizontal ellipse */}
     <div
       style={{
         position: "absolute",
@@ -18,7 +20,6 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
         background: "#E8705A",
       }}
     />
-    {/* Vertical ellipse */}
     <div
       style={{
         position: "absolute",
@@ -31,7 +32,6 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
         opacity: 0.85,
       }}
     />
-    {/* Center overlap (darker) */}
     <div
       style={{
         position: "absolute",
@@ -48,21 +48,21 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
 );
 
 // ============================================
-// Scene 1: Logo Reveal (matches screenshot exactly)
+// Scene 1: Logo (0-0.8s = frames 0-24)
 // ============================================
-export const LogoRevealScene: React.FC = () => {
+export const LogoScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
-  // Smooth fade in
-  const progress = spring({
-    frame,
-    fps,
-    config: { damping: 20, stiffness: 80, mass: 0.8 },
+  // Scale from 0.95 to 1.0 with soft fade
+  const scale = interpolate(frame, [0, 20], [0.95, 1], {
+    extrapolateRight: "clamp",
+    easing: smoothEase,
   });
 
-  const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const scale = interpolate(progress, [0, 1], [0.96, 1]);
+  const opacity = interpolate(frame, [0, 15], [0, 1], {
+    extrapolateRight: "clamp",
+    easing: smoothEase,
+  });
 
   return (
     <AbsoluteFill
@@ -100,220 +100,137 @@ export const LogoRevealScene: React.FC = () => {
 };
 
 // ============================================
-// Scene 2: Hero "Get your shifts together"
+// Scene 2: Hero "Get your shifts together" (0.8-1.5s = frames 24-45)
 // ============================================
 export const HeroScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Phone slide in
-  const phoneProgress = spring({
-    frame,
-    fps,
-    config: { damping: 22, stiffness: 70, mass: 1 },
+  // Wipe from right to left
+  const wipeProgress = interpolate(frame, [0, 15], [100, 0], {
+    extrapolateRight: "clamp",
+    easing: smoothEase,
   });
-  const phoneY = interpolate(phoneProgress, [0, 1], [350, 0]);
-  const phoneOpacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: "clamp" });
 
-  // Staggered elements
-  const getStagger = (delay: number) => {
-    const opacity = interpolate(frame - delay, [0, 12], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-    const y = interpolate(frame - delay, [0, 15], [12, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    });
-    return { opacity, y };
+  // Word by word fade with upward drift
+  const words = ["Get", "your", "shifts", "together"];
+  const getWordAnim = (index: number) => {
+    const delay = 8 + index * 3;
+    return {
+      opacity: interpolate(frame, [delay, delay + 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      y: interpolate(frame, [delay, delay + 8], [20, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase }),
+    };
   };
 
+  // Phone scale and rotation
+  const phoneScale = interpolate(frame, [5, 20], [0.9, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase });
+  const phoneRotation = interpolate(frame, [5, 20], [2, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase });
+  const phoneOpacity = interpolate(frame, [5, 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-      {/* Phone mockup */}
+    <AbsoluteFill style={{ backgroundColor: COLORS.backgroundWarm }}>
+      {/* Wipe mask */}
       <div
         style={{
-          transform: `translateY(${phoneY}px)`,
-          opacity: phoneOpacity,
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: `${wipeProgress}%`,
+          backgroundColor: "#F5F1EB",
+          zIndex: 100,
         }}
-      >
+      />
+
+      {/* Content */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 80 }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 60 }}>
+          <LaborRxIcon size={40} />
+          <span style={{ fontSize: 24, fontWeight: 600, color: "#1a1a1a" }}>LaborRx</span>
+        </div>
+
+        {/* Headline - word by word */}
+        <div style={{ textAlign: "center", marginBottom: 30 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+            {words.slice(0, 2).map((word, i) => {
+              const anim = getWordAnim(i);
+              return (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: 72,
+                    fontWeight: 300,
+                    color: "#8B8B8B",
+                    opacity: anim.opacity,
+                    transform: `translateY(${anim.y}px)`,
+                    display: "inline-block",
+                  }}
+                >
+                  {word}
+                </span>
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+            {words.slice(2).map((word, i) => {
+              const anim = getWordAnim(i + 2);
+              return (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: 72,
+                    fontWeight: 300,
+                    color: "#8B8B8B",
+                    opacity: anim.opacity,
+                    transform: `translateY(${anim.y}px)`,
+                    display: "inline-block",
+                  }}
+                >
+                  {word}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Subtitle */}
+        <p style={{ fontSize: 20, color: "#666", textAlign: "center", maxWidth: 500, marginBottom: 30, opacity: interpolate(frame, [15, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
+          Our AI staffing platform helps SNF administrators reduce costs and improve patient care.
+        </p>
+
+        {/* CTA Button */}
         <div
           style={{
-            width: 360,
-            height: 720,
-            backgroundColor: "#1a1a1a",
-            borderRadius: 48,
-            padding: 12,
-            boxShadow: "0 50px 100px rgba(0,0,0,0.15), 0 20px 40px rgba(0,0,0,0.1)",
+            padding: "16px 32px",
+            backgroundColor: COLORS.primary,
+            borderRadius: 30,
+            opacity: interpolate(frame, [18, 25], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+          }}
+        >
+          <span style={{ color: "white", fontSize: 16, fontWeight: 600 }}>Book your Free Demo</span>
+        </div>
+
+        {/* Phone mockup */}
+        <div
+          style={{
+            marginTop: 40,
+            opacity: phoneOpacity,
+            transform: `scale(${phoneScale}) rotate(${phoneRotation}deg)`,
           }}
         >
           <div
             style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: COLORS.backgroundWarm,
-              borderRadius: 38,
-              overflow: "hidden",
-              padding: "60px 24px 24px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              width: 280,
+              height: 500,
+              backgroundColor: "#1a1a1a",
+              borderRadius: 40,
+              padding: 8,
+              boxShadow: "0 30px 60px rgba(0,0,0,0.15)",
             }}
           >
-            {/* Notch */}
-            <div
-              style={{
-                position: "absolute",
-                top: 12,
-                width: 130,
-                height: 32,
-                backgroundColor: "#1a1a1a",
-                borderRadius: 16,
-              }}
-            />
-
-            {/* Content */}
-            <div style={{ ...getStagger(20), transform: `translateY(${getStagger(20).y}px)`, textAlign: "center", marginTop: 30 }}>
-              <h1 style={{ fontSize: 34, fontWeight: 300, color: COLORS.textLight, margin: 0, lineHeight: 1.15 }}>
-                Get your
-              </h1>
-              <h1 style={{ fontSize: 34, fontWeight: 300, color: COLORS.textLight, margin: 0, lineHeight: 1.15 }}>
-                shifts together
-              </h1>
-            </div>
-
-            <p
-              style={{
-                ...getStagger(24),
-                transform: `translateY(${getStagger(24).y}px)`,
-                fontSize: 12,
-                color: COLORS.textMuted,
-                textAlign: "center",
-                marginTop: 16,
-                maxWidth: 280,
-                lineHeight: 1.5,
-              }}
-            >
-              Our AI staffing platform helps SNF administrators reduce costs and improve patient care.
-            </p>
-
-            <div
-              style={{
-                ...getStagger(28),
-                transform: `translateY(${getStagger(28).y}px)`,
-                marginTop: 24,
-                padding: "14px 28px",
-                backgroundColor: COLORS.primary,
-                borderRadius: 30,
-              }}
-            >
-              <span style={{ color: COLORS.white, fontSize: 13, fontWeight: 600 }}>Book your Free Demo</span>
-            </div>
+            <div style={{ width: "100%", height: "100%", backgroundColor: "#FDF8F5", borderRadius: 34, overflow: "hidden" }} />
           </div>
-        </div>
-      </div>
-
-      {/* Floating cards */}
-      <FloatingCard delay={30} x={160} y={320} width={200}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: COLORS.primary, display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <span style={{ color: "white", fontSize: 12, fontWeight: 600 }}>RN</span>
-          </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: COLORS.text }}>Annette Black</div>
-            <div style={{ fontSize: 11, color: COLORS.success }}>On time</div>
-          </div>
-        </div>
-      </FloatingCard>
-
-      <FloatingCard delay={34} x={1520} y={380} width={190}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16 }}>📅</span>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: COLORS.text }}>Oct 18, 2023</div>
-            <div style={{ fontSize: 10, color: COLORS.textMuted }}>7AM-3PM</div>
-          </div>
-        </div>
-      </FloatingCard>
-
-      <FloatingCard delay={38} x={1480} y={520} width={210}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 14 }}>⭐</span>
-          <span style={{ fontSize: 13, fontWeight: 500, color: COLORS.text }}>Google Rating 4.7</span>
-        </div>
-      </FloatingCard>
-    </AbsoluteFill>
-  );
-};
-
-// ============================================
-// Scene 3: Scheduling Screen (Full Screen)
-// ============================================
-export const SchedulingScene: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const fadeIn = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: "clamp" });
-  const scaleIn = interpolate(frame, [0, 25], [0.97, 1], {
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-
-  const getStagger = (delay: number) => ({
-    opacity: interpolate(frame - delay, [0, 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-    y: interpolate(frame - delay, [0, 18], [15, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
-  });
-
-  return (
-    <AbsoluteFill
-      style={{
-        justifyContent: "center",
-        alignItems: "center",
-        opacity: fadeIn,
-        transform: `scale(${scaleIn})`,
-      }}
-    >
-      {/* Title */}
-      <div style={{ textAlign: "center", marginBottom: 40, ...getStagger(5) }}>
-        <h1 style={{ fontSize: 48, fontWeight: 400, color: COLORS.textLight, margin: 0, fontStyle: "italic", lineHeight: 1.3, maxWidth: 900 }}>
-          Scheduling staff drains energy and time.
-        </h1>
-        <h1 style={{ fontSize: 48, fontWeight: 400, color: COLORS.textLight, margin: "8px 0 0 0", fontStyle: "italic", lineHeight: 1.3 }}>
-          LaborRX offers a smooth, cost-efficient staffing solution.
-        </h1>
-      </div>
-
-      {/* Toggle */}
-      <div style={{ ...getStagger(15), transform: `translateY(${getStagger(15).y}px)`, marginBottom: 40 }}>
-        <div style={{ display: "flex", backgroundColor: COLORS.backgroundPeach, borderRadius: 30, padding: 5 }}>
-          <div style={{ padding: "12px 24px", backgroundColor: COLORS.secondary, borderRadius: 25, color: COLORS.white, fontSize: 14, fontWeight: 500 }}>
-            For Facilities
-          </div>
-          <div style={{ padding: "12px 24px", color: COLORS.text, fontSize: 14, fontWeight: 500 }}>
-            For Nurses
-          </div>
-        </div>
-      </div>
-
-      {/* Dashboard Card */}
-      <div
-        style={{
-          ...getStagger(20),
-          transform: `translateY(${getStagger(20).y}px)`,
-          width: 900,
-          backgroundColor: COLORS.white,
-          borderRadius: 24,
-          padding: 32,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div style={{ fontSize: 24, fontWeight: 700, color: COLORS.text, marginBottom: 24 }}>Reports</div>
-        <div style={{ display: "flex", gap: 16 }}>
-          <StatCard label="Total Call-offs" value="342" change="-12%" isNegative />
-          <StatCard label="Auto-Approval Rate" value="78.5%" change="+5.2%" />
-          <StatCard label="Shifts Replaced" value="321" change="-18%" isNegative />
-          <StatCard label="Unfilled Shifts" value="8" change="+33%" />
         </div>
       </div>
     </AbsoluteFill>
@@ -321,88 +238,136 @@ export const SchedulingScene: React.FC = () => {
 };
 
 // ============================================
-// Scene 4: Outcomes Comparison
+// Scene 3: Comparison "Your SNF" (1.5-3s = frames 45-90)
 // ============================================
-export const OutcomesScene: React.FC = () => {
+export const ComparisonScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  const fadeIn = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" });
-  const slideX = interpolate(frame, [0, 20], [40, 0], { extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+  // Slide transition
+  const slideIn = interpolate(frame, [0, 12], [100, 0], { extrapolateRight: "clamp", easing: smoothEase });
 
-  const getStagger = (delay: number) => ({
-    opacity: interpolate(frame - delay, [0, 12], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-    y: interpolate(frame - delay, [0, 15], [10, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
-  });
+  // Title fade
+  const titleOpacity = interpolate(frame, [5, 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Left card slides from left
+  const leftCardX = interpolate(frame, [10, 25], [-50, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase });
+  const leftCardOpacity = interpolate(frame, [10, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Right card slides from right (0.2s delay = 6 frames)
+  const rightCardX = interpolate(frame, [16, 31], [50, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase });
+  const rightCardOpacity = interpolate(frame, [16, 28], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Staggered items
+  const getItemAnim = (cardDelay: number, index: number) => {
+    const delay = cardDelay + 8 + index * 3;
+    return {
+      opacity: interpolate(frame, [delay, delay + 6], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      scale: interpolate(frame, [delay, delay + 6], [0.8, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase }),
+    };
+  };
+
+  const reactiveItems = ["paying premium agency prices", "straining already tight budgets", "falling behind with compliance regulations", "compromising quality of care"];
+  const proactiveItems = ["The right staff", "Are in the right place", "At the right time", "For the right budget"];
 
   return (
-    <AbsoluteFill
-      style={{
-        justifyContent: "center",
-        alignItems: "center",
-        opacity: fadeIn,
-        transform: `translateX(${slideX}px)`,
-      }}
-    >
+    <AbsoluteFill style={{ backgroundColor: "#F8F6F2", transform: `translateX(${slideIn}%)` }}>
       {/* Title */}
       <h1
         style={{
-          ...getStagger(0),
-          fontSize: 52,
+          fontSize: 48,
           fontWeight: 500,
           fontStyle: "italic",
-          color: COLORS.text,
+          color: "#2D2D2D",
+          textAlign: "center",
+          marginTop: 80,
           marginBottom: 50,
+          opacity: titleOpacity,
+          fontFamily: "Georgia, serif",
         }}
       >
         Your SNF. You choose the outcome.
       </h1>
 
-      {/* Comparison Cards */}
-      <div style={{ display: "flex", gap: 40 }}>
-        {/* Reactive */}
+      {/* Cards container */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 40, padding: "0 100px" }}>
+        {/* Reactive Card */}
         <div
           style={{
-            ...getStagger(10),
-            width: 450,
-            backgroundColor: "#F5F5F5",
+            width: 480,
+            backgroundColor: "#F0F0F0",
             borderRadius: 24,
             padding: 40,
+            opacity: leftCardOpacity,
+            transform: `translateX(${leftCardX}px)`,
           }}
         >
           <div style={{ textAlign: "center", marginBottom: 30 }}>
-            <div style={{ fontSize: 20, color: COLORS.text }}>Your SNF Minus LaborRX =</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: COLORS.error, fontStyle: "italic", marginTop: 8 }}>Reactive</div>
-            <div style={{ fontSize: 14, color: COLORS.textMuted, marginTop: 12 }}>Scrambling to fill shifts leaves you:</div>
+            <div style={{ fontSize: 22, color: "#2D2D2D" }}>Your SNF Minus LaborRX =</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: "#E53935", fontStyle: "italic", marginTop: 8 }}>Reactive</div>
+            <div style={{ fontSize: 14, color: "#888", marginTop: 12 }}>Scrambling to fill shifts leaves you:</div>
           </div>
-          {["paying premium agency prices", "straining already tight budgets", "falling behind with compliance", "compromising quality of care"].map((item, i) => (
-            <div key={i} style={{ ...getStagger(15 + i * 4), display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "14px 18px", backgroundColor: "#FFF", borderRadius: 12 }}>
-              <span style={{ color: COLORS.error, fontSize: 16 }}>✕</span>
-              <span style={{ color: COLORS.text, fontStyle: "italic", fontSize: 15 }}>{item}</span>
-            </div>
-          ))}
+          {reactiveItems.map((item, i) => {
+            const anim = getItemAnim(10, i);
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  marginBottom: 14,
+                  padding: "14px 20px",
+                  backgroundColor: "#FFF",
+                  borderRadius: 12,
+                  opacity: anim.opacity,
+                  transform: `scale(${anim.scale})`,
+                }}
+              >
+                <span style={{ color: "#E53935", fontSize: 16, fontWeight: 700 }}>✕</span>
+                <span style={{ color: "#2D2D2D", fontStyle: "italic", fontSize: 15 }}>{item}</span>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Proactive */}
+        {/* Proactive Card */}
         <div
           style={{
-            ...getStagger(12),
-            width: 450,
-            backgroundColor: "#F5EFE6",
+            width: 480,
+            backgroundColor: "#EDE8DC",
             borderRadius: 24,
             padding: 40,
+            opacity: rightCardOpacity,
+            transform: `translateX(${rightCardX}px)`,
           }}
         >
           <div style={{ textAlign: "center", marginBottom: 30 }}>
-            <div style={{ fontSize: 20, color: COLORS.text }}>Your SNF Plus LaborRX =</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: COLORS.success, fontStyle: "italic", marginTop: 8 }}>Proactive</div>
-            <div style={{ fontSize: 14, color: COLORS.textMuted, marginTop: 12 }}>Analyzing your staff needs means:</div>
+            <div style={{ fontSize: 22, color: "#2D2D2D" }}>Your SNF Plus LaborRX =</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: "#4CAF50", fontStyle: "italic", marginTop: 8 }}>Proactive</div>
+            <div style={{ fontSize: 14, color: "#888", marginTop: 12 }}>Analyzing your staff needs in real-time means:</div>
           </div>
-          {["The right staff", "Are in the right place", "At the right time", "For the right budget"].map((item, i) => (
-            <div key={i} style={{ ...getStagger(18 + i * 4), display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "14px 18px", backgroundColor: "rgba(255,255,255,0.7)", borderRadius: 12 }}>
-              <span style={{ color: COLORS.success, fontSize: 16 }}>✓</span>
-              <span style={{ color: COLORS.text, fontSize: 15 }}>{item}</span>
-            </div>
-          ))}
+          {proactiveItems.map((item, i) => {
+            const anim = getItemAnim(16, i);
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  marginBottom: 14,
+                  padding: "14px 20px",
+                  backgroundColor: "rgba(255,255,255,0.7)",
+                  borderRadius: 12,
+                  opacity: anim.opacity,
+                  transform: `scale(${anim.scale})`,
+                }}
+              >
+                <span style={{ color: "#4CAF50", fontSize: 16, fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#2D2D2D", fontSize: 15 }}>{item}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </AbsoluteFill>
@@ -410,111 +375,118 @@ export const OutcomesScene: React.FC = () => {
 };
 
 // ============================================
-// Scene 5: Feature Cards
+// Scene 4: Reports Dashboard (3-4s = frames 90-120)
 // ============================================
-export const FeatureCardsScene: React.FC = () => {
+export const ReportsScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" });
+  // Upward slide transition
+  const slideY = interpolate(frame, [0, 15], [100, 0], { extrapolateRight: "clamp", easing: smoothEase });
+  const fadeIn = interpolate(frame, [0, 12], [0, 1], { extrapolateRight: "clamp" });
 
-  const getCardAnim = (index: number) => {
-    const delay = index * 6;
-    const progress = spring({
-      frame: frame - delay,
-      fps,
-      config: { damping: 18, stiffness: 100, mass: 0.8 },
-    });
+  // Cascade effect for stat cards (left to right)
+  const getStatAnim = (index: number) => {
+    const delay = 8 + index * 4;
     return {
-      opacity: interpolate(progress, [0, 1], [0, 1]),
-      scale: interpolate(progress, [0, 1], [0.9, 1]),
-      y: interpolate(progress, [0, 1], [30, 0]),
+      opacity: interpolate(frame, [delay, delay + 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      scale: interpolate(frame, [delay, delay + 8], [0.9, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase }),
     };
   };
 
-  const features = [
-    { icon: "👤", title: "Reduce Labor Costs", color: "#E8F5E9", items: ["Compare costs between per diem and agency", "Adjust staffing based on acuity", "Prevent overtime through tracking"] },
-    { icon: "⏰", title: "Maximize Administrative Time", color: "#E3F2FD", items: ["Automate shift posting and tracking", "Communicate efficiently with staff", "View all labor spending in one place"] },
-    { icon: "📋", title: "Increase Staffing Efficiency", color: "#FFF3E0", items: ["Predict upcoming shifts", "Automate your shift posting", "Distribute shifts easily and quickly"] },
-    { icon: "😊", title: "Increase Staff Satisfaction", color: "#FCE4EC", items: ["Provide mobile app for preferences", "Get rid of mandatory overtime", "Create predictable schedules"] },
+  // Breakdown sections fade
+  const breakdownOpacity = interpolate(frame, [20, 28], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const breakdownY = interpolate(frame, [20, 28], [15, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase });
+
+  const stats = [
+    { label: "Total Call-offs", value: "342", change: "-12%", isNegative: true },
+    { label: "Auto-Approval Rate", value: "78.5%", change: "+5.2%", isNegative: false },
+    { label: "Shifts Replaced", value: "321", change: "-18%", isNegative: true },
+    { label: "Unfilled Shifts", value: "8", change: "+33%", isNegative: false },
   ];
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity: fadeIn }}>
-      <h1 style={{ fontSize: 44, fontWeight: 600, color: COLORS.text, marginBottom: 50, textAlign: "center", maxWidth: 800 }}>
-        With LaborRX your skilled nursing facility will take a turn for the better
-      </h1>
-
-      <div style={{ display: "flex", gap: 24 }}>
-        {features.map((feature, i) => {
-          const anim = getCardAnim(i);
-          return (
-            <div
-              key={i}
-              style={{
-                width: 280,
-                backgroundColor: feature.color,
-                borderRadius: 20,
-                padding: 28,
-                opacity: anim.opacity,
-                transform: `scale(${anim.scale}) translateY(${anim.y}px)`,
-              }}
-            >
-              <div style={{ fontSize: 28, marginBottom: 16 }}>{feature.icon}</div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: COLORS.text, marginBottom: 16, lineHeight: 1.2 }}>{feature.title}</h3>
-              {feature.items.map((item, j) => (
-                <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 10 }}>
-                  <span style={{ color: COLORS.success, fontSize: 12, marginTop: 2 }}>✓</span>
-                  <span style={{ fontSize: 12, color: COLORS.text, lineHeight: 1.4 }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          );
-        })}
+    <AbsoluteFill
+      style={{
+        backgroundColor: COLORS.backgroundWarm,
+        opacity: fadeIn,
+        transform: `translateY(${slideY}px)`,
+      }}
+    >
+      {/* Header text */}
+      <div style={{ textAlign: "center", padding: "60px 0 30px" }}>
+        <h1 style={{ fontSize: 42, fontWeight: 400, color: "#888", fontStyle: "italic", margin: 0, lineHeight: 1.3 }}>
+          Scheduling staff drains energy and time.
+        </h1>
+        <h1 style={{ fontSize: 42, fontWeight: 400, color: "#888", fontStyle: "italic", margin: "10px 0 0", lineHeight: 1.3 }}>
+          LaborRX offers a smooth, cost-efficient staffing solution.
+        </h1>
       </div>
-    </AbsoluteFill>
-  );
-};
 
-// ============================================
-// Scene 6: Thank You
-// ============================================
-export const ThankYouScene: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+      {/* Toggle */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 30 }}>
+        <div style={{ display: "flex", backgroundColor: "#EDE8E0", borderRadius: 30, padding: 4 }}>
+          <div style={{ padding: "12px 24px", backgroundColor: "#2D2D2D", borderRadius: 26, color: "white", fontSize: 14 }}>For Facilities</div>
+          <div style={{ padding: "12px 24px", color: "#2D2D2D", fontSize: 14 }}>For Nurses</div>
+        </div>
+      </div>
 
-  const progress = spring({
-    frame,
-    fps,
-    config: { damping: 20, stiffness: 60, mass: 1 },
-  });
-
-  const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const scale = interpolate(progress, [0, 1], [0.95, 1]);
-  const y = interpolate(progress, [0, 1], [20, 0]);
-
-  return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-      <div
-        style={{
-          opacity,
-          transform: `scale(${scale}) translateY(${y}px)`,
-          textAlign: "center",
-        }}
-      >
-        <h1
+      {/* Dashboard card */}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
           style={{
-            fontSize: 72,
-            fontWeight: 600,
-            color: COLORS.text,
-            marginBottom: 20,
+            width: 1000,
+            backgroundColor: "white",
+            borderRadius: 20,
+            padding: 30,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
           }}
         >
-          Thank you
-        </h1>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
-          <LaborRxIcon size={50} />
-          <span style={{ fontSize: 32, fontWeight: 600, color: COLORS.text }}>LaborRx</span>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#2D2D2D", marginBottom: 24 }}>Reports</div>
+
+          {/* Stats row with cascade */}
+          <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+            {stats.map((stat, i) => {
+              const anim = getStatAnim(i);
+              return (
+                <div
+                  key={i}
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#F9F9F9",
+                    borderRadius: 12,
+                    padding: 20,
+                    opacity: anim.opacity,
+                    transform: `scale(${anim.scale})`,
+                  }}
+                >
+                  <div style={{ fontSize: 12, color: "#999", marginBottom: 6 }}>{stat.label}</div>
+                  <div style={{ fontSize: 32, fontWeight: 700, color: "#2D2D2D" }}>{stat.value}</div>
+                  <div style={{ fontSize: 12, color: stat.isNegative ? "#E53935" : "#4CAF50", marginTop: 6 }}>
+                    {stat.change} vs last week
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Breakdown sections */}
+          <div
+            style={{
+              display: "flex",
+              gap: 20,
+              opacity: breakdownOpacity,
+              transform: `translateY(${breakdownY}px)`,
+            }}
+          >
+            <div style={{ flex: 1, backgroundColor: "#F9F9F9", borderRadius: 12, padding: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Approved Call-offs Breakdown</div>
+              <div style={{ fontSize: 12, color: "#666" }}>Auto-Approved: 342 | Manual: 62 | Denied: 10</div>
+            </div>
+            <div style={{ flex: 1, backgroundColor: "#F9F9F9", borderRadius: 12, padding: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>How Shifts Were Replaced</div>
+              <div style={{ fontSize: 12, color: "#666" }}>User Browse: 138 | Admin: 122 | Auto: 61</div>
+            </div>
+          </div>
         </div>
       </div>
     </AbsoluteFill>
@@ -522,59 +494,92 @@ export const ThankYouScene: React.FC = () => {
 };
 
 // ============================================
-// Helper Components
+// Scene 5: Feature Cards (4-5s = frames 120-150)
 // ============================================
-const FloatingCard: React.FC<{
-  children: React.ReactNode;
-  delay: number;
-  x: number;
-  y: number;
-  width: number;
-}> = ({ children, delay, x, y, width }) => {
+export const FeatureCardsScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
-  const progress = spring({
-    frame: frame - delay,
-    fps,
-    config: { damping: 18, stiffness: 100, mass: 0.7 },
-  });
+  // Zoom transition from previous
+  const zoomIn = interpolate(frame, [0, 10], [1.15, 1], { extrapolateRight: "clamp", easing: smoothEase });
+  const fadeIn = interpolate(frame, [0, 8], [0, 1], { extrapolateRight: "clamp" });
 
-  const opacity = interpolate(progress, [0, 1], [0, 1]);
-  const translateY = interpolate(progress, [0, 1], [15, 0]);
-  const float = Math.sin((frame - delay) / 25) * 3;
+  // 2x2 grid reveal: top-left, top-right, bottom-left, bottom-right
+  const getCardAnim = (index: number) => {
+    const delays = [5, 6.5, 8, 9.5]; // 0.05s stagger = ~1.5 frames
+    const delay = delays[index];
+    return {
+      opacity: interpolate(frame, [delay, delay + 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      y: interpolate(frame, [delay, delay + 10], [10, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: smoothEase }),
+    };
+  };
+
+  // Breathing animation at end
+  const breathe = frame > 20 ? interpolate(Math.sin((frame - 20) / 8), [-1, 1], [1, 1.02]) : 1;
+
+  const features = [
+    {
+      icon: "👤",
+      title: "Reduce Labor Costs",
+      color: "#E8F5E9",
+      items: ["Compare costs between per diem and agency options", "Adjust staffing based on acuity and census", "Prevent overtime through our tracking system", "Monitor labor costs on our user-friendly dashboard"],
+    },
+    {
+      icon: "⏰",
+      title: "Maximize Administrative Time",
+      color: "#E3F2FD",
+      items: ["Automate your shift posting, time/attendance tracking", "Communicate efficiently with staff through mobile app", "View all labor spending on our centralized dashboard"],
+    },
+    {
+      icon: "📋",
+      title: "Increase Staffing Efficiency",
+      color: "#FFF8E1",
+      items: ["Predict upcoming shifts", "Automate your shift posting", "Choose from your internal per diem pools", "Distribute shifts easily and quickly"],
+    },
+    {
+      icon: "😊",
+      title: "Increase Staff Satisfaction/Retention",
+      color: "#FCE4EC",
+      items: ["Provide mobile app for shift preference selection", "Get rid of mandatory overtime", "Create predictable shift schedules", "Reduce last-minute schedule changes"],
+    },
+  ];
 
   return (
-    <div
+    <AbsoluteFill
       style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width,
-        opacity,
-        transform: `translateY(${translateY + (frame > delay + 20 ? float : 0)}px)`,
-        backgroundColor: COLORS.white,
-        borderRadius: 16,
-        padding: "14px 18px",
-        boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+        backgroundColor: "#FAFAFA",
+        opacity: fadeIn,
+        transform: `scale(${zoomIn * breathe})`,
       }}
     >
-      {children}
-    </div>
+      <div style={{ padding: "60px 80px" }}>
+        {/* 2x2 Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+          {features.map((feature, i) => {
+            const anim = getCardAnim(i);
+            return (
+              <div
+                key={i}
+                style={{
+                  backgroundColor: feature.color,
+                  borderRadius: 20,
+                  padding: 28,
+                  opacity: anim.opacity,
+                  transform: `translateY(${anim.y}px)`,
+                }}
+              >
+                <div style={{ fontSize: 28, marginBottom: 12 }}>{feature.icon}</div>
+                <h3 style={{ fontSize: 22, fontWeight: 700, color: "#2D2D2D", marginBottom: 16, lineHeight: 1.2 }}>{feature.title}</h3>
+                {feature.items.map((item, j) => (
+                  <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                    <span style={{ color: "#4CAF50", fontSize: 12, marginTop: 3 }}>✓</span>
+                    <span style={{ fontSize: 13, color: "#444", lineHeight: 1.4 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </AbsoluteFill>
   );
 };
-
-const StatCard: React.FC<{
-  label: string;
-  value: string;
-  change: string;
-  isNegative?: boolean;
-}> = ({ label, value, change, isNegative }) => (
-  <div style={{ flex: 1, backgroundColor: "#F9F9F9", borderRadius: 16, padding: 20 }}>
-    <div style={{ fontSize: 13, color: COLORS.textMuted, marginBottom: 8 }}>{label}</div>
-    <div style={{ fontSize: 32, fontWeight: 700, color: COLORS.text }}>{value}</div>
-    <div style={{ fontSize: 13, color: isNegative ? COLORS.error : COLORS.success, marginTop: 8 }}>
-      {change} vs last week
-    </div>
-  </div>
-);
