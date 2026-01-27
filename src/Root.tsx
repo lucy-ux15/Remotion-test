@@ -1,9 +1,9 @@
 import { Composition } from "remotion";
 import { ProductDemo } from "./compositions/ProductDemo";
 
-// Video settings
-const FPS = 30;
-const DURATION_SECONDS = 5; // 5 second fast teaser with 6 scenes
+// Video settings - Premium 10-second animation at 60fps
+const FPS = 60;
+const DURATION_SECONDS = 10;
 
 export const RemotionRoot: React.FC = () => {
   return (
