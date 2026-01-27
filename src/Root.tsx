@@ -1,9 +1,9 @@
 import { Composition } from "remotion";
 import { ProductDemo } from "./compositions/ProductDemo";
 
-// Video settings - Premium 10-second animation at 60fps
+// Video settings - Premium 15-second animation at 60fps
 const FPS = 60;
-const DURATION_SECONDS = 10;
+const DURATION_SECONDS = 15;
 
 export const RemotionRoot: React.FC = () => {
   return (

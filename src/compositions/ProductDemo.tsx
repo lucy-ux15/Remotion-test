@@ -1,41 +1,72 @@
 import { AbsoluteFill, Sequence } from "remotion";
 import {
-  LogoScene,
-  HeroScene,
-  ComparisonScene,
-  ReportsScene,
-  FeatureCardsScene,
-} from "../components/AllScenes";
+  Scene1Logo,
+  Scene2HeroText,
+  Scene3HeroPhone,
+  Scene4ValueProp1,
+  Scene5ValueProp2,
+  Scene6ValueProp3,
+  Scene7ProblemCard,
+  Scene8Comparison,
+  Scene9Dashboard,
+  Scene10ThankYou,
+} from "../components/ImageSlideshow";
 
 export const ProductDemo: React.FC = () => {
-  // Premium 10-second animation at 60fps = 600 frames total
+  // 15-second animation at 60fps = 900 frames total
+  // Using ACTUAL PNG screenshot images
   const FPS = 60;
 
   return (
-    <AbsoluteFill>
-      {/* Scene 1: Logo Intro (0-2s) */}
-      <Sequence from={0} durationInFrames={FPS * 2}>
-        <LogoScene />
+    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      {/* Scene 1: Logo (0-1.5s) */}
+      <Sequence from={0} durationInFrames={90}>
+        <Scene1Logo />
       </Sequence>
 
-      {/* Scene 2: Hero Screen with Phone (2-4.5s) */}
-      <Sequence from={FPS * 2} durationInFrames={FPS * 2.5}>
-        <HeroScene />
+      {/* Scene 2: Hero Text Only (1.5-3s) */}
+      <Sequence from={90} durationInFrames={90}>
+        <Scene2HeroText />
       </Sequence>
 
-      {/* Scene 3: Comparison Screen (4.5-6.5s) */}
-      <Sequence from={FPS * 4.5} durationInFrames={FPS * 2}>
-        <ComparisonScene />
+      {/* Scene 3: Hero with Phone (3-5s) */}
+      <Sequence from={180} durationInFrames={120}>
+        <Scene3HeroPhone />
       </Sequence>
 
-      {/* Scene 4: Reports Dashboard (6.5-8.5s) */}
-      <Sequence from={FPS * 6.5} durationInFrames={FPS * 2}>
-        <ReportsScene />
+      {/* Scene 4: Value Prop 1 - "smooth" (5-6.5s) */}
+      <Sequence from={300} durationInFrames={90}>
+        <Scene4ValueProp1 />
       </Sequence>
 
-      {/* Scene 5: Feature Cards Finale (8.5-10s) */}
-      <Sequence from={FPS * 8.5} durationInFrames={FPS * 1.5}>
-        <FeatureCardsScene />
+      {/* Scene 5: Value Prop 2 - "cost-efficient" (6.5-8s) */}
+      <Sequence from={390} durationInFrames={90}>
+        <Scene5ValueProp2 />
+      </Sequence>
+
+      {/* Scene 6: Value Prop 3 - "professional" (8-9.5s) */}
+      <Sequence from={480} durationInFrames={90}>
+        <Scene6ValueProp3 />
+      </Sequence>
+
+      {/* Scene 7: Problem Card - Reactive (9.5-10.5s) */}
+      <Sequence from={570} durationInFrames={60}>
+        <Scene7ProblemCard />
+      </Sequence>
+
+      {/* Scene 8: Comparison Cards (10.5-12s) */}
+      <Sequence from={630} durationInFrames={90}>
+        <Scene8Comparison />
+      </Sequence>
+
+      {/* Scene 9: Dashboard (12-13.5s) */}
+      <Sequence from={720} durationInFrames={90}>
+        <Scene9Dashboard />
+      </Sequence>
+
+      {/* Scene 10: Thank You (13.5-15s) */}
+      <Sequence from={810} durationInFrames={90}>
+        <Scene10ThankYou />
       </Sequence>
     </AbsoluteFill>
   );
