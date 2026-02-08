@@ -1,42 +1,36 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, Easing, spring, useVideoConfig, Img, staticFile } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, Easing, spring, useVideoConfig } from "remotion";
 
 // ============================================
 // DESIGN TOKENS - EXACT match from screenshots
 // ============================================
 const colors = {
-  // Background gradient (cream/beige from screenshots)
   bgTop: "#F8F5F0",
   bgBottom: "#EDE5D8",
-  // Text colors (exact from screenshots)
   textPrimary: "#5C5147",
   textSecondary: "#7A7269",
-  // Logo colors (exact coral/orange from logo screenshot)
   logoCoralLight: "#F5A08A",
   logoCoral: "#E8705A",
   logoCoralDark: "#D85A45",
   logoText: "#1A1A1A",
-  // Accent colors (exact from comparison screenshot)
   accentGreen: "#43A047",
   accentRed: "#E53935",
-  // Card backgrounds (exact from comparison screenshot)
   cardGray: "#E8E4DF",
   cardTan: "#E5D9C3",
   cardWhite: "#FFFFFF",
 };
 
-// Font - Serif font matching screenshots (slab-serif style)
 const fontSerif = "'Rockwell', 'Courier New', Georgia, serif";
 const fontSans = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
-// Easing functions for smooth, trendy animations
+// Easing
 const easeOutSmooth = Easing.bezier(0.16, 1, 0.3, 1);
-const easeOutBounce = Easing.bezier(0.34, 1.56, 0.64, 1);
 const easeInSmooth = Easing.bezier(0.7, 0, 0.84, 0);
+const easeInOutSmooth = Easing.bezier(0.45, 0, 0.55, 1);
 
 const FPS = 60;
 
 // ============================================
-// GRADIENT BACKGROUND - Exact from screenshots
+// GRADIENT BACKGROUND
 // ============================================
 const GradientBackground: React.FC = () => (
   <div
@@ -49,11 +43,10 @@ const GradientBackground: React.FC = () => (
 );
 
 // ============================================
-// LABORRX LOGO ICON - Exact from screenshot
+// LABORRX LOGO ICON
 // ============================================
 const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 100 }) => (
   <div style={{ width: size, height: size, position: "relative" }}>
-    {/* Horizontal ellipse (lighter coral) */}
     <div
       style={{
         position: "absolute",
@@ -65,7 +58,6 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 100 }) => (
         background: colors.logoCoralLight,
       }}
     />
-    {/* Vertical ellipse (main coral) */}
     <div
       style={{
         position: "absolute",
@@ -77,7 +69,6 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 100 }) => (
         background: colors.logoCoral,
       }}
     />
-    {/* Center intersection (darker) */}
     <div
       style={{
         position: "absolute",
@@ -93,62 +84,64 @@ const LaborRxIcon: React.FC<{ size?: number }> = ({ size = 100 }) => (
 );
 
 // ============================================
-// SCENE 1: LOGO INTRO (0-3 seconds)
-// Exact match to logo screenshot
+// SCENE 1: LOGO INTRO (0-3 seconds = 180 frames)
 // ============================================
 export const LogoScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Fade in logo with scale animation (0.8 -> 1.0)
-  const logoOpacity = interpolate(frame, [0, 45], [0, 1], {
+  // Scale from 80% to 100% with smooth easing
+  const logoScale = interpolate(frame, [0, 50], [0.8, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const logoScale = interpolate(frame, [0, 45], [0.8, 1], {
+  // Fade in
+  const logoOpacity = interpolate(frame, [0, 40], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // Subtle glow pulse
-  const glowOpacity = interpolate(frame, [30, 60], [0, 0.5], {
+  // Glow effect
+  const glowOpacity = interpolate(frame, [30, 70], [0, 0.6], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // Gentle breathing during hold
-  const breathing = frame > 60 ? 1 + 0.02 * Math.sin(((frame - 60) / 60) * Math.PI) : 1;
+  // Subtle breathing during hold (50-150)
+  const breathing = frame > 50 && frame < 150
+    ? 1 + 0.015 * Math.sin(((frame - 50) / 50) * Math.PI)
+    : 1;
 
-  // Exit fade
+  // Fade out transition (150-180)
   const exitOpacity = interpolate(frame, [150, 180], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
   });
 
-  const finalOpacity = frame >= 150 ? exitOpacity : logoOpacity;
+  const finalOpacity = frame >= 150 ? logoOpacity * exitOpacity : logoOpacity;
 
   return (
     <AbsoluteFill>
       <GradientBackground />
 
-      {/* Subtle glow behind logo */}
+      {/* Glow effect */}
       <div
         style={{
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 300,
-          height: 300,
+          width: 350,
+          height: 350,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${colors.logoCoral}30 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${colors.logoCoral}35 0%, transparent 70%)`,
           opacity: glowOpacity * finalOpacity,
-          filter: "blur(30px)",
+          filter: "blur(40px)",
         }}
       />
 
@@ -161,7 +154,7 @@ export const LogoScene: React.FC = () => {
           transform: `translate(-50%, -50%) scale(${logoScale * breathing})`,
           display: "flex",
           alignItems: "center",
-          gap: 20,
+          gap: 24,
           opacity: finalOpacity,
         }}
       >
@@ -183,8 +176,7 @@ export const LogoScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 2: HERO - "Get your shifts together"
-// Exact match to hero screenshot
+// SCENE 2: HERO (3-10 seconds = 420 frames)
 // ============================================
 export const HeroScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -197,71 +189,84 @@ export const HeroScene: React.FC = () => {
     easing: easeOutSmooth,
   });
 
-  // Headline animation - fade + slide up
-  const headlineOpacity = interpolate(frame, [15, 45], [0, 1], {
+  // Headline spring animation (bouncy)
+  const headlineSpring = spring({
+    frame: frame - 10,
+    fps,
+    config: { damping: 15, stiffness: 200, mass: 1 },
+  });
+
+  const headlineY = interpolate(headlineSpring, [0, 1], [60, 0]);
+
+  // Subtext fade
+  const subOpacity = interpolate(frame, [40, 60], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const headlineY = interpolate(frame, [15, 60], [30, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
-
-  // Subheadline
-  const subOpacity = interpolate(frame, [45, 75], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
-
-  // Phone mockup with spring
+  // Phone mockup spring (center)
   const phoneSpring = spring({
-    frame: frame - 60,
+    frame: frame - 50,
     fps,
-    config: { damping: 12, stiffness: 80, mass: 1 },
+    config: { damping: 12, stiffness: 150, mass: 1 },
   });
 
-  // Left cards spring
-  const leftCardsSpring = spring({
-    frame: frame - 75,
+  // Left cards spring (staggered)
+  const leftCard1Spring = spring({
+    frame: frame - 70,
     fps,
-    config: { damping: 14, stiffness: 100, mass: 0.8 },
+    config: { damping: 14, stiffness: 180, mass: 0.8 },
   });
 
-  // Right cards spring
-  const rightCardsSpring = spring({
-    frame: frame - 90,
+  const leftCard2Spring = spring({
+    frame: frame - 85,
     fps,
-    config: { damping: 14, stiffness: 100, mass: 0.8 },
+    config: { damping: 14, stiffness: 180, mass: 0.8 },
+  });
+
+  const leftCard3Spring = spring({
+    frame: frame - 100,
+    fps,
+    config: { damping: 14, stiffness: 180, mass: 0.8 },
+  });
+
+  // Right cards spring (staggered)
+  const rightCard1Spring = spring({
+    frame: frame - 80,
+    fps,
+    config: { damping: 14, stiffness: 180, mass: 0.8 },
+  });
+
+  const rightCard2Spring = spring({
+    frame: frame - 95,
+    fps,
+    config: { damping: 14, stiffness: 180, mass: 0.8 },
   });
 
   // Decorative shapes
-  const shapesOpacity = interpolate(frame, [60, 90], [0, 1], {
+  const shapesOpacity = interpolate(frame, [50, 80], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-    easing: easeOutSmooth,
   });
 
   // Floating animation during hold
-  const float = frame > 120 ? 4 * Math.sin(((frame - 120) / 120) * Math.PI * 2) : 0;
+  const float = frame > 120 ? 5 * Math.sin(((frame - 120) / 100) * Math.PI * 2) : 0;
 
-  // Exit
-  const exitOpacity = interpolate(frame, [270, 300], [1, 0], {
+  // Exit fade
+  const exitOpacity = interpolate(frame, [390, 420], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
   });
 
-  const finalOpacity = frame >= 270 ? exitOpacity : sceneOpacity;
+  const finalOpacity = frame >= 390 ? sceneOpacity * exitOpacity : sceneOpacity;
 
   return (
     <AbsoluteFill style={{ opacity: finalOpacity }}>
       <GradientBackground />
 
-      {/* Decorative background shapes - peach/coral circles */}
+      {/* Decorative shapes */}
       <div
         style={{
           position: "absolute",
@@ -287,7 +292,7 @@ export const HeroScene: React.FC = () => {
         }}
       />
 
-      {/* Main content - centered */}
+      {/* Main content */}
       <div
         style={{
           display: "flex",
@@ -298,7 +303,7 @@ export const HeroScene: React.FC = () => {
           paddingTop: 100,
         }}
       >
-        {/* Headline - exact from screenshot */}
+        {/* Headline */}
         <h1
           style={{
             fontSize: 80,
@@ -308,7 +313,7 @@ export const HeroScene: React.FC = () => {
             textAlign: "center",
             margin: 0,
             lineHeight: 1.15,
-            opacity: headlineOpacity,
+            opacity: headlineSpring,
             transform: `translateY(${headlineY}px)`,
           }}
         >
@@ -332,113 +337,113 @@ export const HeroScene: React.FC = () => {
         </p>
       </div>
 
-      {/* Phone and UI cards section */}
+      {/* Phone and UI cards */}
       <div
         style={{
           position: "absolute",
           bottom: 50,
           left: "50%",
-          transform: `translateX(-50%) translateY(${(1 - phoneSpring) * 80 + float}px)`,
+          transform: `translateX(-50%) translateY(${(1 - phoneSpring) * 100 + float}px) scale(${0.9 + phoneSpring * 0.1})`,
           opacity: phoneSpring,
         }}
       >
-        {/* Left UI Card - RN list */}
+        {/* Left Card 1 - RN list */}
         <div
           style={{
             position: "absolute",
-            left: -220,
-            top: -10,
-            transform: `translateX(${(1 - leftCardsSpring) * -60}px)`,
-            opacity: leftCardsSpring,
+            left: -230,
+            top: -20,
+            transform: `translateX(${(1 - leftCard1Spring) * -80}px) scale(${0.95 + leftCard1Spring * 0.05})`,
+            opacity: leftCard1Spring,
           }}
         >
           <div
             style={{
               backgroundColor: colors.cardWhite,
-              borderRadius: 12,
-              padding: 14,
-              boxShadow: "0 6px 24px rgba(0,0,0,0.08)",
-              width: 190,
+              borderRadius: 14,
+              padding: 16,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+              width: 200,
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 700, color: colors.textPrimary, marginBottom: 10 }}>RN</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#E8E8E8" }} />
-              <span style={{ fontSize: 12, color: colors.textPrimary }}>Annette Black</span>
-              <span style={{ fontSize: 10, color: colors.accentGreen, marginLeft: "auto", fontWeight: 500 }}>On time</span>
+            <div style={{ fontSize: 14, fontWeight: 700, color: colors.textPrimary, marginBottom: 12 }}>RN</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#E0E0E0" }} />
+              <span style={{ fontSize: 13, color: colors.textPrimary }}>Annette Black</span>
+              <span style={{ fontSize: 11, color: colors.accentGreen, marginLeft: "auto", fontWeight: 600 }}>On time</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#E8E8E8" }} />
-              <span style={{ fontSize: 12, color: colors.textPrimary }}>Kathryn Murphy</span>
-              <span style={{ fontSize: 10, color: colors.accentRed, marginLeft: "auto", fontWeight: 500 }}>Late arrival</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#E0E0E0" }} />
+              <span style={{ fontSize: 13, color: colors.textPrimary }}>Kathryn Murphy</span>
+              <span style={{ fontSize: 11, color: colors.accentRed, marginLeft: "auto", fontWeight: 600 }}>Late arrival</span>
             </div>
           </div>
         </div>
 
-        {/* Left badge - Shift Pickup */}
+        {/* Left Card 2 - Shift Pickup */}
         <div
           style={{
             position: "absolute",
-            left: -200,
-            top: 140,
-            transform: `scale(${leftCardsSpring})`,
-            opacity: leftCardsSpring,
+            left: -210,
+            top: 130,
+            transform: `scale(${0.9 + leftCard2Spring * 0.1})`,
+            opacity: leftCard2Spring,
           }}
         >
           <div
             style={{
               backgroundColor: colors.cardWhite,
-              borderRadius: 20,
-              padding: "8px 14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              borderRadius: 24,
+              padding: "10px 16px",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
               display: "flex",
               alignItems: "center",
-              gap: 6,
+              gap: 8,
             }}
           >
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#E8E8E8" }} />
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.logoCoral, background: `${colors.logoCoral}15`, padding: "2px 6px", borderRadius: 4 }}>RN</span>
-            <span style={{ fontSize: 11, color: colors.textPrimary }}>Robert Murphy</span>
-            <span style={{ fontSize: 10, color: colors.logoCoral, fontWeight: 500 }}>Shift Pickup</span>
+            <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#E0E0E0" }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: colors.logoCoral, background: `${colors.logoCoral}15`, padding: "3px 8px", borderRadius: 4 }}>RN</span>
+            <span style={{ fontSize: 12, color: colors.textPrimary }}>Robert Murphy</span>
+            <span style={{ fontSize: 11, color: colors.logoCoral, fontWeight: 600 }}>Shift Pickup</span>
           </div>
         </div>
 
-        {/* Approved badge */}
+        {/* Left Card 3 - Approved */}
         <div
           style={{
             position: "absolute",
-            left: -160,
-            top: 200,
-            transform: `scale(${leftCardsSpring})`,
-            opacity: leftCardsSpring,
+            left: -170,
+            top: 195,
+            transform: `scale(${0.9 + leftCard3Spring * 0.1})`,
+            opacity: leftCard3Spring,
           }}
         >
           <div
             style={{
               backgroundColor: colors.cardWhite,
-              borderRadius: 20,
-              padding: "8px 14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              borderRadius: 24,
+              padding: "10px 16px",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
               display: "flex",
               alignItems: "center",
-              gap: 6,
+              gap: 8,
             }}
           >
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#E8E8E8" }} />
-            <span style={{ fontSize: 11, color: colors.textPrimary }}>Darrell Steward</span>
-            <span style={{ fontSize: 10, color: colors.accentGreen, fontWeight: 500 }}>Approved</span>
+            <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#E0E0E0" }} />
+            <span style={{ fontSize: 12, color: colors.textPrimary }}>Darrell Steward</span>
+            <span style={{ fontSize: 11, color: colors.accentGreen, fontWeight: 600 }}>Approved</span>
           </div>
         </div>
 
-        {/* Phone device */}
+        {/* Phone */}
         <div
           style={{
-            width: 240,
-            height: 480,
+            width: 250,
+            height: 500,
             backgroundColor: "#1a1a1a",
-            borderRadius: 36,
-            padding: 6,
-            boxShadow: "0 30px 60px rgba(0,0,0,0.12)",
+            borderRadius: 40,
+            padding: 8,
+            boxShadow: "0 40px 80px rgba(0,0,0,0.15)",
           }}
         >
           <div
@@ -446,86 +451,86 @@ export const HeroScene: React.FC = () => {
               width: "100%",
               height: "100%",
               backgroundColor: "#FDF8F3",
-              borderRadius: 32,
+              borderRadius: 34,
               overflow: "hidden",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <div style={{ fontSize: 60 }}>👩‍⚕️</div>
+            <div style={{ fontSize: 80 }}>👩‍⚕️</div>
           </div>
         </div>
 
-        {/* Right UI Card - Date/Time picker */}
-        <div
-          style={{
-            position: "absolute",
-            right: -200,
-            top: 0,
-            transform: `translateX(${(1 - rightCardsSpring) * 60}px)`,
-            opacity: rightCardsSpring,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: colors.cardWhite,
-              borderRadius: 12,
-              padding: 14,
-              boxShadow: "0 6px 24px rgba(0,0,0,0.08)",
-              width: 150,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 14 }}>📅</span>
-              <span style={{ fontSize: 12, color: colors.textPrimary }}>Oct 18, 2023</span>
-              <span style={{ marginLeft: "auto", color: colors.textSecondary }}>⌄</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 14 }}>☀️</span>
-              <span style={{ fontSize: 12, color: colors.textPrimary }}>7AM-3PM</span>
-              <span style={{ marginLeft: "auto", color: colors.textSecondary }}>⌄</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right UI Card - Unit info */}
+        {/* Right Card 1 - Date picker */}
         <div
           style={{
             position: "absolute",
             right: -210,
-            top: 120,
-            transform: `translateX(${(1 - rightCardsSpring) * 60}px)`,
-            opacity: rightCardsSpring,
+            top: -10,
+            transform: `translateX(${(1 - rightCard1Spring) * 80}px) scale(${0.95 + rightCard1Spring * 0.05})`,
+            opacity: rightCard1Spring,
           }}
         >
           <div
             style={{
               backgroundColor: colors.cardWhite,
-              borderRadius: 12,
-              padding: 14,
-              boxShadow: "0 6px 24px rgba(0,0,0,0.08)",
-              width: 170,
+              borderRadius: 14,
+              padding: 16,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+              width: 160,
             }}
           >
-            <div style={{ textAlign: "center", marginBottom: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>Unit 3</span>
-              <span style={{ marginLeft: 6, fontSize: 11, color: colors.logoCoral }}>✦</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 16 }}>📅</span>
+              <span style={{ fontSize: 13, color: colors.textPrimary }}>Oct 18, 2023</span>
+              <span style={{ marginLeft: "auto", color: colors.textSecondary }}>⌄</span>
             </div>
-            <div style={{ fontSize: 10, color: colors.textSecondary, marginBottom: 10, textAlign: "center" }}>
-              <span style={{ color: colors.accentGreen, fontWeight: 500 }}>RN 1/1</span>
-              <span style={{ marginLeft: 10, color: colors.logoCoral, fontWeight: 500 }}>LPN 1/1</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16 }}>☀️</span>
+              <span style={{ fontSize: 13, color: colors.textPrimary }}>7AM-3PM</span>
+              <span style={{ marginLeft: "auto", color: colors.textSecondary }}>⌄</span>
             </div>
-            <div style={{ fontSize: 10, color: colors.textSecondary, marginBottom: 6 }}>Nurses</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#E8E8E8" }} />
-              <span style={{ fontSize: 11, color: colors.textPrimary }}>Cody Fisher</span>
-              <span style={{ fontSize: 9, color: colors.cardWhite, background: colors.accentGreen, padding: "1px 5px", borderRadius: 3, marginLeft: "auto" }}>RN</span>
+          </div>
+        </div>
+
+        {/* Right Card 2 - Unit info */}
+        <div
+          style={{
+            position: "absolute",
+            right: -220,
+            top: 120,
+            transform: `translateX(${(1 - rightCard2Spring) * 80}px) scale(${0.95 + rightCard2Spring * 0.05})`,
+            opacity: rightCard2Spring,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: colors.cardWhite,
+              borderRadius: 14,
+              padding: 16,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+              width: 180,
+            }}
+          >
+            <div style={{ textAlign: "center", marginBottom: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>Unit 3</span>
+              <span style={{ marginLeft: 8, fontSize: 12, color: colors.logoCoral }}>✦</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#E8E8E8" }} />
-              <span style={{ fontSize: 11, color: colors.textPrimary }}>Ethan Davis</span>
-              <span style={{ fontSize: 9, color: colors.cardWhite, background: colors.logoCoral, padding: "1px 5px", borderRadius: 3, marginLeft: "auto" }}>LPN</span>
+            <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 12, textAlign: "center" }}>
+              <span style={{ color: colors.accentGreen, fontWeight: 600 }}>RN 1/1</span>
+              <span style={{ marginLeft: 12, color: colors.logoCoral, fontWeight: 600 }}>LPN 1/1</span>
+            </div>
+            <div style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 8 }}>Nurses</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#E0E0E0" }} />
+              <span style={{ fontSize: 12, color: colors.textPrimary }}>Cody Fisher</span>
+              <span style={{ fontSize: 10, color: colors.cardWhite, background: colors.accentGreen, padding: "2px 6px", borderRadius: 4, marginLeft: "auto" }}>RN</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#E0E0E0" }} />
+              <span style={{ fontSize: 12, color: colors.textPrimary }}>Ethan Davis</span>
+              <span style={{ fontSize: 10, color: colors.cardWhite, background: colors.logoCoral, padding: "2px 6px", borderRadius: 4, marginLeft: "auto" }}>LPN</span>
             </div>
           </div>
         </div>
@@ -535,9 +540,9 @@ export const HeroScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 3: TEXT WITH ROTATING WORD
-// "Scheduling staff drains energy and time.
-// LaborRX offers a professional... / cost-efficient... / smooth... platform"
+// SCENE 3: TEXT MORPHING (10-20 seconds = 600 frames)
+// "Scheduling staff drains energy and time."
+// "LaborRX offers a professional... / cost-efficient... / smooth platform"
 // ============================================
 export const RotatingTextScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -549,87 +554,71 @@ export const RotatingTextScene: React.FC = () => {
     easing: easeOutSmooth,
   });
 
-  // First two lines fade in
+  // First line fade in
   const line1Opacity = interpolate(frame, [20, 50], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const line1Y = interpolate(frame, [20, 50], [20, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
-
-  // Third line "LaborRX offers a" appears
+  // Second line "LaborRX offers a" fade in
   const line2Opacity = interpolate(frame, [60, 90], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // Rotating words: professional, cost-efficient, smooth
-  // Each word shows for ~120 frames (2 seconds)
-  const words = ["professional", "cost-efficient", "smooth"];
-  const wordStartFrame = 100;
-  const wordDuration = 120; // 2 seconds per word
+  // Word timing:
+  // "professional" (100-280): 3 seconds hold
+  // Transition (250-310): 1 second crossfade
+  // "cost-efficient" (280-460): 3 seconds hold
+  // Transition (430-490): 1 second crossfade
+  // "smooth platform" (460-600): final state
 
-  const getWordState = (wordIndex: number) => {
-    const wordStart = wordStartFrame + wordIndex * wordDuration;
-    const wordEnd = wordStart + wordDuration;
-
-    // Fade in
-    const fadeIn = interpolate(frame, [wordStart, wordStart + 30], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: easeOutSmooth,
-    });
-
-    // Fade out (not for last word until "platform" appears)
-    const fadeOut = wordIndex < words.length - 1
-      ? interpolate(frame, [wordEnd - 30, wordEnd], [1, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: easeInSmooth,
-        })
-      : 1;
-
-    const slideY = interpolate(frame, [wordStart, wordStart + 30], [15, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: easeOutSmooth,
-    });
-
-    return {
-      opacity: Math.min(fadeIn, fadeOut),
-      y: slideY,
-    };
-  };
-
-  // "platform" appears after last rotating word
-  const platformStartFrame = wordStartFrame + (words.length - 1) * wordDuration + 60;
-  const platformOpacity = interpolate(frame, [platformStartFrame, platformStartFrame + 40], [0, 1], {
+  // Professional word
+  const professionalOpacity = interpolate(frame, [100, 130, 250, 310], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: easeInOutSmooth,
+  });
+  const professionalScale = interpolate(frame, [100, 130], [0.95, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // Last word fades out when platform appears
-  const lastWordFadeOut = interpolate(frame, [platformStartFrame - 30, platformStartFrame + 10], [1, 0], {
+  // Cost-efficient word
+  const costEfficientOpacity = interpolate(frame, [280, 310, 430, 490], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-    easing: easeInSmooth,
+    easing: easeInOutSmooth,
+  });
+  const costEfficientScale = interpolate(frame, [280, 310], [0.95, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: easeOutSmooth,
+  });
+
+  // Smooth platform (final)
+  const smoothOpacity = interpolate(frame, [460, 500], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: easeOutSmooth,
+  });
+  const smoothScale = interpolate(frame, [460, 500], [0.95, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: easeOutSmooth,
   });
 
   // Exit fade
-  const exitOpacity = interpolate(frame, [540, 600], [1, 0], {
+  const exitOpacity = interpolate(frame, [570, 600], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
   });
 
-  const finalOpacity = frame >= 540 ? exitOpacity : sceneOpacity;
+  const finalOpacity = frame >= 570 ? sceneOpacity * exitOpacity : sceneOpacity;
 
   return (
     <AbsoluteFill style={{ opacity: finalOpacity }}>
@@ -646,95 +635,82 @@ export const RotatingTextScene: React.FC = () => {
           padding: "0 100px",
         }}
       >
-        {/* First two lines - static */}
-        <div
+        {/* First line */}
+        <h1
           style={{
+            fontSize: 58,
+            fontWeight: 400,
+            fontFamily: fontSerif,
+            color: colors.textSecondary,
+            margin: 0,
+            lineHeight: 1.35,
+            fontStyle: "italic",
             opacity: line1Opacity,
-            transform: `translateY(${line1Y}px)`,
           }}
         >
-          <h1
-            style={{
-              fontSize: 60,
-              fontWeight: 400,
-              fontFamily: fontSerif,
-              color: colors.textSecondary,
-              margin: 0,
-              lineHeight: 1.3,
-              fontStyle: "italic",
-            }}
-          >
-            Scheduling staff drains<br />energy and time.
-          </h1>
-        </div>
+          Scheduling staff drains<br />energy and time.
+        </h1>
 
-        {/* Third line with rotating word */}
-        <div
+        {/* Second line with rotating word */}
+        <h1
           style={{
-            marginTop: 20,
+            fontSize: 58,
+            fontWeight: 400,
+            fontFamily: fontSerif,
+            color: colors.textSecondary,
+            margin: "25px 0 0 0",
+            lineHeight: 1.35,
+            fontStyle: "italic",
             opacity: line2Opacity,
           }}
         >
-          <h1
-            style={{
-              fontSize: 60,
-              fontWeight: 400,
-              fontFamily: fontSerif,
-              color: colors.textSecondary,
-              margin: 0,
-              lineHeight: 1.3,
-              fontStyle: "italic",
-            }}
-          >
-            LaborRX offers a{" "}
-            <span style={{ position: "relative", display: "inline-block", minWidth: 380 }}>
-              {/* Rotating words */}
-              {words.map((word, i) => {
-                const state = getWordState(i);
-                const isLast = i === words.length - 1;
-                const actualOpacity = isLast && frame >= platformStartFrame - 30
-                  ? state.opacity * lastWordFadeOut
-                  : state.opacity;
-
-                return (
-                  <span
-                    key={i}
-                    style={{
-                      position: i === 0 ? "relative" : "absolute",
-                      left: i === 0 ? 0 : 0,
-                      opacity: actualOpacity,
-                      transform: `translateY(${state.y}px)`,
-                      color: colors.textSecondary,
-                    }}
-                  >
-                    {word}
-                    {!isLast || frame < platformStartFrame - 30 ? "..." : ""}
-                  </span>
-                );
-              })}
-
-              {/* "smooth platform" final state */}
-              <span
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  opacity: platformOpacity,
-                  color: colors.textSecondary,
-                }}
-              >
-                smooth platform.
-              </span>
+          LaborRX offers a{" "}
+          <span style={{ position: "relative", display: "inline-block" }}>
+            {/* Professional */}
+            <span
+              style={{
+                opacity: professionalOpacity,
+                transform: `scale(${professionalScale})`,
+                display: "inline-block",
+              }}
+            >
+              professional...
             </span>
-          </h1>
-        </div>
+
+            {/* Cost-efficient */}
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                opacity: costEfficientOpacity,
+                transform: `scale(${costEfficientScale})`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              cost-efficient...
+            </span>
+
+            {/* Smooth platform */}
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                opacity: smoothOpacity,
+                transform: `scale(${smoothScale})`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              smooth platform.
+            </span>
+          </span>
+        </h1>
       </div>
     </AbsoluteFill>
   );
 };
 
 // ============================================
-// SCENE 4: COMPARISON - Cards appear one by one
-// "Your SNF. You choose the outcome."
+// SCENE 4: COMPARISON (20-28 seconds = 480 frames)
 // ============================================
 export const ComparisonScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -747,65 +723,57 @@ export const ComparisonScene: React.FC = () => {
     easing: easeOutSmooth,
   });
 
-  // Headline animation
-  const headlineOpacity = interpolate(frame, [15, 45], [0, 1], {
+  // Headline
+  const headlineOpacity = interpolate(frame, [10, 40], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const headlineY = interpolate(frame, [15, 45], [-20, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
-
-  // First card (Reactive) - slides in from left
-  const card1Spring = spring({
-    frame: frame - 50,
+  // LEFT CARD - slides in from left with spring
+  const leftCardSpring = spring({
+    frame: frame - 40,
     fps,
-    config: { damping: 14, stiffness: 80, mass: 1 },
+    config: { damping: 15, stiffness: 150, mass: 1 },
   });
 
-  // First card list items cascade
-  const getCard1ItemOpacity = (itemIndex: number) => {
-    const itemFrame = 80 + itemIndex * 15;
-    return interpolate(frame, [itemFrame, itemFrame + 20], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: easeOutSmooth,
+  // Left card items (staggered, 0.3s = 18 frames each)
+  const getLeftItemSpring = (index: number) => {
+    return spring({
+      frame: frame - (70 + index * 18),
+      fps,
+      config: { damping: 12, stiffness: 200, mass: 0.7 },
     });
   };
 
-  // Second card (Proactive) - slides in from right, AFTER first card
-  const card2Spring = spring({
-    frame: frame - 180,
+  // RIGHT CARD - slides in from right (0.5s after left starts = 30 frames)
+  const rightCardSpring = spring({
+    frame: frame - 70,
     fps,
-    config: { damping: 14, stiffness: 80, mass: 1 },
+    config: { damping: 15, stiffness: 150, mass: 1 },
   });
 
-  // Second card list items cascade
-  const getCard2ItemOpacity = (itemIndex: number) => {
-    const itemFrame = 210 + itemIndex * 15;
-    return interpolate(frame, [itemFrame, itemFrame + 20], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: easeOutSmooth,
+  // Right card items (staggered)
+  const getRightItemSpring = (index: number) => {
+    return spring({
+      frame: frame - (110 + index * 18),
+      fps,
+      config: { damping: 12, stiffness: 200, mass: 0.7 },
     });
   };
 
   // Floating animation
-  const float1 = frame > 150 ? 3 * Math.sin(((frame - 150) / 150) * Math.PI * 2) : 0;
-  const float2 = frame > 280 ? -3 * Math.sin(((frame - 280) / 150) * Math.PI * 2) : 0;
+  const float1 = frame > 150 ? 4 * Math.sin(((frame - 150) / 120) * Math.PI * 2) : 0;
+  const float2 = frame > 180 ? -4 * Math.sin(((frame - 180) / 120) * Math.PI * 2) : 0;
 
-  // Exit
-  const exitOpacity = interpolate(frame, [390, 420], [1, 0], {
+  // Exit fade
+  const exitOpacity = interpolate(frame, [450, 480], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeInSmooth,
   });
 
-  const finalOpacity = frame >= 390 ? exitOpacity : sceneOpacity;
+  const finalOpacity = frame >= 450 ? sceneOpacity * exitOpacity : sceneOpacity;
 
   const reactiveItems = [
     "paying premium agency prices",
@@ -832,10 +800,10 @@ export const ComparisonScene: React.FC = () => {
           alignItems: "center",
           justifyContent: "flex-start",
           height: "100%",
-          paddingTop: 60,
+          paddingTop: 50,
         }}
       >
-        {/* Headline - exact from screenshot */}
+        {/* Headline */}
         <h1
           style={{
             fontSize: 48,
@@ -844,153 +812,159 @@ export const ComparisonScene: React.FC = () => {
             fontFamily: fontSerif,
             color: colors.textPrimary,
             textAlign: "center",
-            margin: "0 0 40px 0",
+            margin: "0 0 35px 0",
             opacity: headlineOpacity,
-            transform: `translateY(${headlineY}px)`,
           }}
         >
           Your SNF. You choose the outcome.
         </h1>
 
-        {/* Cards container */}
-        <div style={{ display: "flex", gap: 30, alignItems: "flex-start" }}>
-          {/* Reactive Card (Left) - appears first */}
+        {/* Cards */}
+        <div style={{ display: "flex", gap: 35, alignItems: "flex-start" }}>
+          {/* Reactive Card */}
           <div
             style={{
-              width: 380,
+              width: 400,
               backgroundColor: colors.cardGray,
-              borderRadius: 20,
-              padding: 30,
-              transform: `translateX(${(1 - card1Spring) * -100}px) translateY(${float1}px)`,
-              opacity: card1Spring,
+              borderRadius: 24,
+              padding: 32,
+              transform: `translateX(${(1 - leftCardSpring) * -150}px) translateY(${float1}px)`,
+              opacity: leftCardSpring,
             }}
           >
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 18, color: colors.textPrimary, fontFamily: fontSans }}>
+            <div style={{ textAlign: "center", marginBottom: 26 }}>
+              <div style={{ fontSize: 20, color: colors.textPrimary, fontFamily: fontSans }}>
                 Your SNF Minus LaborRX =
               </div>
               <div
                 style={{
-                  fontSize: 32,
+                  fontSize: 36,
                   fontWeight: 600,
                   fontFamily: fontSerif,
                   color: colors.accentRed,
-                  marginTop: 6,
+                  marginTop: 8,
                 }}
               >
                 Reactive
               </div>
-              <div style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, fontFamily: fontSans }}>
+              <div style={{ fontSize: 14, color: colors.textSecondary, marginTop: 12, fontFamily: fontSans }}>
                 Scrambling to fill shifts leaves you:
               </div>
             </div>
-            {reactiveItems.map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  marginBottom: 10,
-                  padding: "12px 16px",
-                  backgroundColor: colors.cardWhite,
-                  borderRadius: 24,
-                  transform: `rotate(-2deg)`,
-                  opacity: getCard1ItemOpacity(i),
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-                }}
-              >
-                <span
+            {reactiveItems.map((item, i) => {
+              const itemSpring = getLeftItemSpring(i);
+              return (
+                <div
+                  key={i}
                   style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: "50%",
-                    backgroundColor: colors.accentRed,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    flexShrink: 0,
+                    gap: 12,
+                    marginBottom: 12,
+                    padding: "14px 18px",
+                    backgroundColor: colors.cardWhite,
+                    borderRadius: 28,
+                    transform: `rotate(-2deg) scale(${0.9 + itemSpring * 0.1}) translateY(${(1 - itemSpring) * 20}px)`,
+                    opacity: itemSpring,
+                    boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
                   }}
                 >
-                  ✕
-                </span>
-                <span style={{ color: colors.textPrimary, fontStyle: "italic", fontSize: 13, fontFamily: fontSans }}>
-                  {item}
-                </span>
-              </div>
-            ))}
+                  <span
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      backgroundColor: colors.accentRed,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✕
+                  </span>
+                  <span style={{ color: colors.textPrimary, fontStyle: "italic", fontSize: 14, fontFamily: fontSans }}>
+                    {item}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Proactive Card (Right) - appears second */}
+          {/* Proactive Card */}
           <div
             style={{
-              width: 380,
+              width: 400,
               backgroundColor: colors.cardTan,
-              borderRadius: 20,
-              padding: 30,
-              transform: `translateX(${(1 - card2Spring) * 100}px) translateY(${float2}px)`,
-              opacity: card2Spring,
+              borderRadius: 24,
+              padding: 32,
+              transform: `translateX(${(1 - rightCardSpring) * 150}px) translateY(${float2}px)`,
+              opacity: rightCardSpring,
             }}
           >
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 18, color: colors.textPrimary, fontFamily: fontSans }}>
+            <div style={{ textAlign: "center", marginBottom: 26 }}>
+              <div style={{ fontSize: 20, color: colors.textPrimary, fontFamily: fontSans }}>
                 Your SNF Plus LaborRX =
               </div>
               <div
                 style={{
-                  fontSize: 32,
+                  fontSize: 36,
                   fontWeight: 600,
                   fontFamily: fontSerif,
                   color: colors.accentGreen,
-                  marginTop: 6,
+                  marginTop: 8,
                 }}
               >
                 Proactive
               </div>
-              <div style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, fontFamily: fontSans }}>
+              <div style={{ fontSize: 14, color: colors.textSecondary, marginTop: 12, fontFamily: fontSans }}>
                 Analyzing your staff needs in real-time means:
               </div>
             </div>
-            {proactiveItems.map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  marginBottom: 10,
-                  padding: "12px 16px",
-                  backgroundColor: colors.cardWhite,
-                  borderRadius: 24,
-                  opacity: getCard2ItemOpacity(i),
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-                }}
-              >
-                <span
+            {proactiveItems.map((item, i) => {
+              const itemSpring = getRightItemSpring(i);
+              return (
+                <div
+                  key={i}
                   style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: "50%",
-                    backgroundColor: colors.accentGreen,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    flexShrink: 0,
+                    gap: 12,
+                    marginBottom: 12,
+                    padding: "14px 18px",
+                    backgroundColor: colors.cardWhite,
+                    borderRadius: 28,
+                    transform: `scale(${0.9 + itemSpring * 0.1}) translateY(${(1 - itemSpring) * 20}px)`,
+                    opacity: itemSpring,
+                    boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
                   }}
                 >
-                  ✓
-                </span>
-                <span style={{ color: colors.textPrimary, fontSize: 13, fontFamily: fontSans }}>
-                  {item}
-                </span>
-              </div>
-            ))}
+                  <span
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      backgroundColor: colors.accentGreen,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span style={{ color: colors.textPrimary, fontSize: 14, fontFamily: fontSans }}>
+                    {item}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -999,34 +973,30 @@ export const ComparisonScene: React.FC = () => {
 };
 
 // ============================================
-// SCENE 5: THANK YOU
-// Exact match to screenshot
+// SCENE 5: THANK YOU (28-33 seconds = 300 frames)
 // ============================================
 export const ThankYouScene: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // Scene fade in
-  const sceneOpacity = interpolate(frame, [0, 30], [0, 1], {
+  // Fade in
+  const sceneOpacity = interpolate(frame, [0, 40], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  // Text fade in with scale
-  const textOpacity = interpolate(frame, [20, 60], [0, 1], {
+  // Scale 95% -> 100%
+  const textScale = interpolate(frame, [20, 70], [0.95, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOutSmooth,
   });
 
-  const textScale = interpolate(frame, [20, 60], [0.9, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: easeOutSmooth,
-  });
+  // Subtle floating (1-2px up/down, slow)
+  const floatY = frame > 70 ? 2 * Math.sin(((frame - 70) / 80) * Math.PI) : 0;
 
   // Subtle breathing
-  const breathing = frame > 60 ? 1 + 0.01 * Math.sin(((frame - 60) / 90) * Math.PI) : 1;
+  const breathing = frame > 70 ? 1 + 0.008 * Math.sin(((frame - 70) / 60) * Math.PI) : 1;
 
   return (
     <AbsoluteFill style={{ opacity: sceneOpacity }}>
@@ -1041,7 +1011,6 @@ export const ThankYouScene: React.FC = () => {
           height: "100%",
         }}
       >
-        {/* Thank you text - exact from screenshot */}
         <h1
           style={{
             fontSize: 90,
@@ -1049,8 +1018,7 @@ export const ThankYouScene: React.FC = () => {
             fontFamily: fontSerif,
             color: colors.textPrimary,
             margin: 0,
-            opacity: textOpacity,
-            transform: `scale(${textScale * breathing})`,
+            transform: `scale(${textScale * breathing}) translateY(${floatY}px)`,
           }}
         >
           Thank you.

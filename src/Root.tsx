@@ -1,10 +1,10 @@
 import { Composition } from "remotion";
 import { ProductDemo } from "./compositions/ProductDemo";
 
-// Video settings - Premium 30-second animation at 60fps
+// Video settings - Premium 33-second animation at 60fps
 // 1920x1080 Full HD resolution
 const FPS = 60;
-const DURATION_SECONDS = 30;
+const DURATION_SECONDS = 33;
 
 export const RemotionRoot: React.FC = () => {
   return (

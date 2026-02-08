@@ -8,42 +8,42 @@ import {
 } from "../components/LaborRxScenes";
 
 // LaborRx Premium Product Demo Video
-// Total Duration: 35 seconds at 60fps = 2100 frames
+// Total Duration: 33 seconds at 60fps = 1980 frames
 //
 // Scene Timeline:
-// - Scene 1: Logo            (0-3s)     = frames 0-180
-// - Scene 2: Hero            (3-8s)     = frames 180-480
-// - Scene 3: Rotating Text   (8-18s)    = frames 480-1080
-// - Scene 4: Comparison      (18-25s)   = frames 1080-1500
-// - Scene 5: Thank You       (25-30s)   = frames 1500-1800
+// - Scene 1: Logo Intro     (0-3s)    = frames 0-180
+// - Scene 2: Hero           (3-10s)   = frames 180-600
+// - Scene 3: Text Morphing  (10-20s)  = frames 600-1200
+// - Scene 4: Comparison     (20-28s)  = frames 1200-1680
+// - Scene 5: Thank You      (28-33s)  = frames 1680-1980
 
 export const ProductDemo: React.FC = () => {
   const FPS = 60;
 
   return (
     <AbsoluteFill>
-      {/* Scene 1: Logo (0-3 seconds) */}
+      {/* Scene 1: Logo Intro (0-3 seconds) */}
       <Sequence from={0} durationInFrames={FPS * 3}>
         <LogoScene />
       </Sequence>
 
-      {/* Scene 2: Hero - "Get your shifts together" (3-8 seconds) */}
-      <Sequence from={FPS * 3} durationInFrames={FPS * 5}>
+      {/* Scene 2: Hero - "Get your shifts together" (3-10 seconds) */}
+      <Sequence from={FPS * 3} durationInFrames={FPS * 7}>
         <HeroScene />
       </Sequence>
 
-      {/* Scene 3: Rotating Text - professional / cost-efficient / smooth platform (8-18 seconds) */}
-      <Sequence from={FPS * 8} durationInFrames={FPS * 10}>
+      {/* Scene 3: Text Morphing - professional / cost-efficient / smooth platform (10-20 seconds) */}
+      <Sequence from={FPS * 10} durationInFrames={FPS * 10}>
         <RotatingTextScene />
       </Sequence>
 
-      {/* Scene 4: Comparison - Reactive vs Proactive cards (18-25 seconds) */}
-      <Sequence from={FPS * 18} durationInFrames={FPS * 7}>
+      {/* Scene 4: Comparison - Reactive vs Proactive cards (20-28 seconds) */}
+      <Sequence from={FPS * 20} durationInFrames={FPS * 8}>
         <ComparisonScene />
       </Sequence>
 
-      {/* Scene 5: Thank You (25-30 seconds) */}
-      <Sequence from={FPS * 25} durationInFrames={FPS * 5}>
+      {/* Scene 5: Thank You (28-33 seconds) */}
+      <Sequence from={FPS * 28} durationInFrames={FPS * 5}>
         <ThankYouScene />
       </Sequence>
     </AbsoluteFill>
